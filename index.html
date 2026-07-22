@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads Filter Dashboard - Daybreak Edition</title>
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            
+            --neon-cyan: #0ea5e9;
+            --neon-pink: #ec4899;
+            --neon-green: #10b981;
+            --neon-amber: #f59e0b;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+        }
+
+        /* --- Global Aesthetics --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            min-height: 100vh;
+            background: linear-gradient(45deg, #e0f2fe, #f0fdf4, #fdf4ff, #eff6ff);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
+        /* --- Glassmorphism Utilities --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--glass-shadow);
+        }
+        .glass-inner {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        /* --- Navbar --- */
+        .top-navbar {
+            padding: 6px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 16px 16px;
+        }
+        .brand-logo {
+            font-size: 16px;
+            font-weight: 800;
+            background: -webkit-linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+        .metric-chip {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 4px 12px;
+            text-align: center;
+            min-width: 100px;
+        }
+        .metric-val { font-size: 16px; font-weight: 800; }
+        .val-total { color: var(--text-main); }
+        .val-target { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,243,255,0.4); }
+        .val-notarget { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,0,234,0.4); }
+        
+        .btn-glow {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .btn-glow:hover {
+            background: var(--neon-cyan);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+        }
+
+        /* --- Offcanvas Right Drawer (TAL Manager) --- */
+        .offcanvas-glass {
+            background: rgba(248, 250, 252, 0.85);
+            backdrop-filter: blur(24px);
+            border-left: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+        .tal-list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid transparent;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .tal-list-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .tal-list-item.selected {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--neon-cyan);
+            color: var(--text-main);
+            box-shadow: 0 0 10px rgba(0,243,255,0.1);
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;
+        }
+        .status-dot.active { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
+        .status-dot.inactive { background: #475569; }
+
+        /* TAL Active Toggle */
+        .tal-active-toggle {
+            background-color: #ef4444 !important;
+            border-color: #ef4444 !important;
+            box-shadow: none !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+        }
+        .tal-active-toggle:checked {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+        .tal-active-toggle:focus {
+            box-shadow: none !important;
+        }
+        
+        .tal-actions { opacity: 0; transition: opacity 0.2s; }
+        .tal-list-item:hover .tal-actions, .tal-actions.show { opacity: 1; }
+
+        /* Stage Checkbox Fix */
+        .stage-cb {
+            cursor: pointer;
+        }
+        .stage-cb:checked {
+            background-color: var(--neon-cyan) !important;
+            border-color: var(--neon-cyan) !important;
+        }
+        .stage-cb:focus {
+            box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25) !important;
+            border-color: var(--neon-cyan) !important;
+        }
+
+        /* --- Filter Grid --- */
+        .filter-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        /* Segmented Controls */
+        .segmented-control {
+            display: flex;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            padding: 4px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .segmented-control input[type="radio"] { display: none; }
+        .segmented-control label {
+            flex: 1; text-align: center; padding: 4px 8px;
+            font-size: 11px; font-weight: 600; cursor: pointer;
+            border-radius: 4px; transition: all 0.3s;
+            color: var(--text-muted); margin: 0;
+        }
+        .segmented-control input[type="radio"]:checked + label {
+            background: #fff;
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        
+        .compact-toggle {
+            display: flex;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 2px;
+            border: 1px solid rgba(0,0,0,0.05);
+            width: 80px;
+        }
+        .compact-toggle input[type="radio"] { display: none; }
+        .compact-toggle label {
+            flex: 1; text-align: center; padding: 2px 0;
+            font-size: 10px; font-weight: 700; cursor: pointer;
+            border-radius: 10px; transition: all 0.3s;
+            color: var(--text-muted); margin: 0;
+        }
+        .compact-toggle input[type="radio"]:checked + label {
+            background: #fff;
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Form Inputs */
+        .form-control-glass {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: var(--text-main);
+            font-size: 12px;
+            border-radius: 6px;
+            padding: 6px 10px;
+            transition: all 0.2s;
+        }
+        .form-control-glass::placeholder { color: rgba(0,0,0,0.4); }
+        .form-control-glass:focus {
+            background: #fff;
+            border-color: var(--neon-cyan);
+            color: var(--text-main);
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.3);
+            outline: none;
+        }
+        select.form-control-glass option { background: #f8fafc; color: var(--text-main); }
+
+        .dropdown-menu-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .dropdown-menu-glass .dropdown-item { color: var(--text-main); font-size: 13px; }
+        .dropdown-menu-glass .dropdown-item:hover { background: rgba(255,255,255,0.8); }
+        .form-check-label { font-size: 12px; color: var(--text-main); }
+
+        
+        .text-redacted {
+            opacity: 0.2;
+            user-select: none;
+            pointer-events: none;
+            text-decoration: line-through;
+        }
+        .meta-col {
+            background: rgba(0, 0, 0, 0.02) !important;
+        }
+
+        /* --- Data Table --- */
+        .nav-tabs .nav-link.active {
+            border-bottom: 2px solid var(--neon-cyan) !important;
+            color: var(--neon-cyan) !important;
+        }
+        .nav-tabs .nav-link:hover:not(.active) {
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3) !important;
+            color: var(--text-main) !important;
+        }
+
+        .table-container {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+        .table-glass {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-main);
+            background: transparent;
+        }
+        .table-glass thead th {
+            background: rgba(30, 41, 59, 0.9) !important; /* Sleek, professional dark slate */
+            color: #f8fafc !important;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            padding: 14px 16px;
+            border-bottom: 2px solid rgba(14, 165, 233, 0.4); /* Subtle cyan accent */
+            border-top: none;
+            white-space: nowrap;
+            text-shadow: none;
+            transition: all 0.3s ease;
+        }
+        .table-glass.data-fetched thead th {
+            background: rgba(14, 165, 233, 0.85) !important; /* Deep cyan to indicate active fetch */
+            color: #ffffff !important;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+        }
+        .table-glass tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .table-glass tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            white-space: nowrap;
+            background: transparent;
+            color: var(--text-main);
+            border-bottom: none;
+        }
+        .table-glass tbody tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        
+        /* Table Dynamic Classes */
+        .col-hidden { display: none !important; }
+        .col-greyed {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+        .row-highlight {
+            background: rgba(0, 243, 255, 0.05) !important;
+        }
+        .row-highlight td:first-child {
+            box-shadow: inset 3px 0 0 var(--neon-cyan);
+        }
+
+        /* Cell Styling Elements */
+        .badge-stage {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .badge-awareness { color: var(--neon-cyan); border-color: rgba(0,243,255,0.3); }
+        .badge-consideration { color: var(--neon-amber); border-color: rgba(255,184,0,0.3); }
+        .badge-decision { color: var(--neon-green); border-color: rgba(0,255,136,0.3); }
+        .badge-interest { color: var(--neon-pink); border-color: rgba(255,0,234,0.3); }
+        
+        .badge-abm {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-target { color: var(--neon-cyan); border: 1px solid rgba(0,243,255,0.4); background: rgba(0,243,255,0.05); }
+        .badge-notarget { color: var(--neon-pink); border: 1px solid rgba(255,0,234,0.4); background: rgba(255,0,234,0.05); }
+
+        .pri-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 5px currentColor;
+        }
+        .pri-red { color: var(--neon-pink); background: var(--neon-pink); }
+        .pri-amber { color: var(--neon-amber); background: var(--neon-amber); }
+        .pri-blue { color: var(--neon-cyan); background: var(--neon-cyan); }
+        .pri-green { color: var(--neon-green); background: var(--neon-green); }
+
+        .geo-badge {
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .email-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .email-link:hover { color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,243,255,0.5); }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="top-navbar glass-panel mx-3 mt-3">
+        <div class="d-flex align-items-center">
+            <div class="brand-logo me-4">Campaign <span style="color:#1e293b; font-weight:300;">Insights</span></div>
+        </div>
+        
+        <div class="d-none d-md-flex gap-3">
+            <div class="metric-chip">
+                <div class="filter-label mb-1">Total Leads</div>
+                <div class="metric-val val-total" id="metricTotal">0</div>
+            </div>
+            <div class="metric-chip">
+                <div class="filter-label mb-1">Target</div>
+                <div class="metric-val val-target" id="metricTarget">0</div>
+            </div>
+            <div class="metric-chip">
+                <div class="filter-label mb-1">Do Not Target</div>
+                <div class="metric-val val-notarget" id="metricNotTarget">0</div>
+            </div>
+        </div>
+
+        <div>
+            <button class="btn btn-glow btn-sm fw-bold rounded-pill px-3 py-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#talOffcanvas">
+                <i class="fa-solid fa-list-check me-2"></i> TAL Manager
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid px-3 pb-4">
+        
+                <!-- Filter Bar -->
+        <div class="glass-panel p-3 mb-3" style="position: relative; z-index: 100;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-microchip me-2" style="color: var(--neon-cyan)"></i> TAL Config</h6>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-dark fw-semibold px-3 rounded-pill py-0 " style="height:20px; line-height:1; font-size: 12px;" id="resetBtn">Reset All</button>
+                    <button class="btn btn-sm btn-glow fw-bold px-3 rounded-pill shadow-sm py-0" style="height:20px; line-height:1;font-size: 12px;" id="applyBtn">Fetch TAL</button>
+                </div>
+            </div>
+
+            <!-- Compact UI Layout -->
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                
+                <!-- Modes Group -->
+                <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="filter-label mb-0" style="font-size:10px;">Email</span>
+                        <div class="compact-toggle" style="width: 100px;">
+                            <input type="radio" name="emailMode" id="emInclude" value="Include">
+                            <label for="emInclude" style="font-size:9px;">Include</label>
+                            <input type="radio" name="emailMode" id="emExclude" value="Exclude" checked>
+                            <label for="emExclude" style="font-size:9px;">Exclude</label>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 w-">
+                        <span class="filter-label mb-0" style="font-size:10px;">Domain</span>
+                        <div class="compact-toggle" style="width: 100px;">
+                            <input type="radio" name="domainMode" id="domInclude" value="Include">
+                            <label for="domInclude" style="font-size:9px;">Include</label>
+                            <input type="radio" name="domainMode" id="domExclude" value="Exclude" checked>
+                            <label for="domExclude" style="font-size:9px;">Exclude</label>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="filter-label mb-0" style="font-size:10px;">Company</span>
+                        <div class="compact-toggle" style="width: 100px;">
+                            <input type="radio" name="companyMode" id="compInclude" value="Include">
+                            <label for="compInclude" style="font-size:9px;">Include</label>
+                            <input type="radio" name="companyMode" id="compExclude" value="Exclude" checked>
+                            <label for="compExclude" style="font-size:9px;">Exclude</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geo & CPC Group -->
+                <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="filter-label mb-0" style="font-size:10px;">Geo</span>
+                        <select class="form-select form-control-glass px-2 py-0" style="height:22px; font-size:10px; width:auto;" id="geoMode">
+                            <option value="Include">In</option>
+                            <option value="Exclude" selected>Ex</option>
+                        </select>
+                        <input type="text" class="form-control form-control-glass px-2 py-0 shadow-none" style="height:22px; font-size:10px; width:90px;" id="geoInput" placeholder="US, CA...">
+                    </div>
+                    <div class="d-flex align-items-center gap-2 border-start border-light ps-3">
+                        <span class="filter-label mb-0" style="font-size:10px;">CPC</span>
+                        <select class="form-select form-control-glass px-2 py-0" style="height:22px; font-size:10px; width:auto;" id="cpcMode">
+                            <option value="Include">In</option>
+                            <option value="Exclude" selected>Ex</option>
+                        </select>
+                        <input type="number" class="form-control form-control-glass px-2 py-0 shadow-none" style="height:22px; font-size:10px; width:70px;" id="cpcInput" placeholder="Value">
+                    </div>
+                </div>
+
+                <!-- Priority & Status Group -->
+                <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="filter-label mb-0" style="font-size:10px;">Priority</span>
+                        <input type="number" class="form-control form-control-glass px-1 py-0 shadow-none" style="height:22px; font-size:10px; width:45px; text-align:center" id="priMin" min="1" max="10" placeholder="Min">
+                        <span class="text-muted" style="font-size:10px;">-</span>
+                        <input type="number" class="form-control form-control-glass px-1 py-0 shadow-none" style="height:22px; font-size:10px; width:45px; text-align:center" id="priMax" min="1" max="10" placeholder="Max">
+                    </div>
+                    <div class="d-flex align-items-center gap-2 border-start border-light ps-3">
+                        <span class="filter-label mb-0" style="font-size:10px;">ABM</span>
+                        <div class="segmented-control p-0" style="height:22px; border:none; background:transparent;">
+                            <input type="radio" name="abmFilter" id="abmAll" value="All" checked>
+                            <label for="abmAll" class="bg-white rounded-pill" style="font-size:10px; padding: 2px 8px; margin:0; line-height:16px;width: 100px;">All</label>
+                            <input type="radio" name="abmFilter" id="abmTarget" value="Target">
+                            <label for="abmTarget" class="bg-white rounded-pill mx-1" style="font-size:10px; padding: 2px 8px; margin:0; line-height:16px; width: 100px;">Target</label>
+                            <input type="radio" name="abmFilter" id="abmNotTarget" value="DoNotTarget">
+                            <label for="abmNotTarget" class="bg-white rounded-pill" style="font-size:10px; padding: 2px 8px; margin:0; line-height:16px;width:100px;">Do Not Target</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stage Dropdown Group -->
+                <div class="glass-inner p-1 px-3 d-flex align-items-center rounded-pill">
+                    <span class="filter-label mb-0 me-2" style="font-size:10px;">Stage</span>
+                    <div class="dropdown">
+                        <button class="btn d-flex justify-content-between align-items-center form-control-glass px-2 py-0 shadow-none" style="height:22px; font-size:10px; width:180px; background: rgba(0,0,0,0.05);" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                            <span id="stageBtnText" class="text-truncate">All Stages</span>
+                            <i class="fa-solid fa-chevron-down ms-2 text-muted" style="font-size: 8px;"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-glass p-2 shadow" style="font-size: 11px;">
+                            <li><div class="form-check ms-2 mb-1"><input class="form-check-input stage-cb" type="checkbox" value="Awareness" id="stg1"><label class="form-check-label" for="stg1" style="cursor: pointer;">Awareness</label></div></li>
+                            <li><div class="form-check ms-2 mb-1"><input class="form-check-input stage-cb" type="checkbox" value="Consideration" id="stg2"><label class="form-check-label" for="stg2" style="cursor: pointer;">Consideration</label></div></li>
+                            <li><div class="form-check ms-2 mb-1"><input class="form-check-input stage-cb" type="checkbox" value="Decision" id="stg3"><label class="form-check-label" for="stg3" style="cursor: pointer;">Decision</label></div></li>
+                            <li><div class="form-check ms-2 mb-2"><input class="form-check-input stage-cb" type="checkbox" value="Interest" id="stg4"><label class="form-check-label" for="stg4" style="cursor: pointer;">Interest</label></div></li>
+                            <li><hr class="dropdown-divider border-secondary my-1"></li>
+                            <li><a class="dropdown-item text-danger text-center fw-bold rounded" href="#" id="clearStagesBtn" style="padding: 2px 0;">Clear</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- Data Table -->
+        <div class="glass-panel table-container">
+            <!-- New Tab Navigation -->
+            <ul class="nav nav-tabs border-0 px-3 pt-3 mb-0" id="dataTabs" role="tablist" style="background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.05) !important;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-bold" id="mix-tab" data-bs-toggle="tab" data-tab-value="Mix" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-main); font-size: 13px; padding-bottom: 12px;">Mix Active TALs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold" id="filtered-tab" data-bs-toggle="tab" data-tab-value="Filtered" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font-size: 13px; padding-bottom: 12px;">Filtered Data</button>
+                </li>
+
+            </ul>
+            <div class="table-responsive">
+                <table class="table table-glass" id="leadsTable">
+                    <thead>
+                        <tr>
+                            <th id="th-email">Email</th>
+                            <th id="th-domain">Domain</th>
+                            <th id="th-company">Company Name</th>
+                            <th>Geo</th>
+                            <th>Domain CPC</th>
+                            <th>Research Stage</th>
+                            <th>Priority</th>
+                            <th>ABM Status</th>
+                            <th class="meta-col col-hidden border-start border-light">Standard Industry</th>
+                            <th class="meta-col col-hidden">Employee Size</th>
+                            <th class="meta-col col-hidden">HQ Country</th>
+                            <th class="meta-col col-hidden">LinkedIn</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offcanvas Right (TAL Manager) -->
+    <div class="offcanvas offcanvas-end offcanvas-glass border-0" tabindex="-1" id="talOffcanvas" aria-labelledby="talOffcanvasLabel">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title fw-bold" id="talOffcanvasLabel"><i class="fa-solid fa-list-check me-2" style="color: var(--neon-cyan)"></i> TAL Lists</h5>
+            <button type="button" class="btn-close " data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column gap-4">
+            
+            <!-- Sidebar Engine Toggles -->
+            <div class="glass-inner p-3 d-flex flex-column gap-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="filter-label mb-0" style="font-size:10px;">TAL / ABM</span>
+                    <div class="compact-toggle" style="width: 140px;">
+                        <input type="radio" name="sideTalAbm" id="sideAbmYes" value="Yes" checked>
+                        <label for="sideAbmYes" style="font-size:10px;">Enabled</label>
+                        <input type="radio" name="sideTalAbm" id="sideAbmNo" value="No">
+                        <label for="sideAbmNo" style="font-size:10px;">Bypass</label>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="filter-label mb-0" style="font-size:10px;">TAL / ABM Status</span>
+                    <div class="compact-toggle" style="width: 140px;">
+                        <input type="radio" name="sideTalStatus" id="sideStatActive" value="Active" checked>
+                        <label for="sideStatActive" style="font-size:10px;">Live</label>
+                        <input type="radio" name="sideTalStatus" id="sideStatInactive" value="Inactive">
+                        <label for="sideStatInactive" style="font-size:10px;">Dormant</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Manager -->
+            <div class="d-flex flex-column flex-grow-1 min-h-0">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-bold text-dark">TAL Lists</h6>
+                    <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width:26px; height:26px; background: var(--neon-cyan); color: #fff; border: none;" id="addTalBtn" title="Add List"><i class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
+                </div>
+                
+                <button class="btn btn-glow btn-sm border-dashed mb-3 w-100 text-start rounded-3" id="uploadTalBtn">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload TAL
+                </button>
+                
+                                <div id="addTalForm" class="d-none mb-3 p-3 glass-inner shadow-sm rounded-3">
+                    <label class="form-label small fw-bold {text_color} mb-2"><i class="fa-solid fa-folder-plus me-1 text-primary"></i> Create New List</label>
+                    <div class="input-group input-group-sm mb-2">
+                        <input type="text" class="form-control form-control-glass" id="newTalNameInput" placeholder="Enter list name...">
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button class="btn btn-sm {btn_outline} py-1" id="cancelTalBtn" type="button" style="font-size:11px"><i class="fa-solid fa-xmark me-1"></i> Cancel</button>
+                        <button class="btn btn-sm btn-glow py-1 px-3 fw-bold" id="saveTalBtn" type="button" style="font-size:11px"><i class="fa-solid fa-check me-1"></i> Save</button>
+                    </div>
+                </div>
+
+                <div class="tal-list-container flex-grow-1 overflow-y-auto pe-1" id="talListContainer">
+                    <!-- Dynamic TAL items -->
+                </div>
+            </div>
+
+            <div class="mt-auto text-muted small text-center">
+                <i class="fa-solid fa-satellite-dish mb-2 fs-5"></i><br>
+                Deploy modules to restrict visible data nodes.
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Toasts -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1070;">
+        <div id="appToast" class="toast align-items-center glass-panel border-0 text-dark" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-medium" id="appToastMessage"></div>
+                <button type="button" class="btn-close  me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Application Logic -->
+    <script>
+        // --- 1. Mock Data Schema ---
+        const dummyLeads = [
+            { email: "ralph@nhassociates.com", domain: "nhassociates.com", company: "Neil Hoosier & Associates", geo: "US", cpc: 5, stage: "Awareness", priority: 1, abm: "Target", industry: "Government", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "krystal@rdsi.com", domain: "rdsi.com", company: "Research & Design", geo: "US", cpc: 5, stage: "Consideration", priority: 2, abm: "Target", industry: "Manufacturing", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "margaret@national.ball", domain: "national.ball", company: "The National Ball", geo: "CA", cpc: 5, stage: "Decision", priority: 3, abm: "DoNotTarget", industry: "Media & Ent.", size: "51 to 200", hq: "Canada", linkedin: "https://linkedin.com/..." },
+            { email: "sam@hunterhealth.com", domain: "hunterhealth.com", company: "Hunter Health", geo: "US", cpc: 4, stage: "Interest", priority: 2, abm: "Target", industry: "Healthcare", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "harnanda@mativ.com", domain: "mativ.com", company: "Mativ", geo: "US", cpc: 4, stage: "—", priority: 3, abm: "DoNotTarget", industry: "Manufacturing", size: "5k to 10k", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "tricia@hiya.com", domain: "hiya.com", company: "Hiya Inc.", geo: "US", cpc: 4, stage: "Awareness", priority: 1, abm: "Target", industry: "Computer", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "artursb@ofbf.org", domain: "ofbf.org", company: "Ohio Farm B", geo: "US", cpc: 3, stage: "Consideration", priority: 2, abm: "Target", industry: "Non-Profit", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "jacob@pricebenowi.com", domain: "pricebenowi.com", company: "Price Benow", geo: "US", cpc: 3, stage: "Decision", priority: 3, abm: "DoNotTarget", industry: "Legal", size: "11 to 50", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "anthony@groupon.com", domain: "groupon.com", company: "Groupon, Inc", geo: "US", cpc: 3, stage: "Interest", priority: 2, abm: "Target", industry: "Marketing", size: "1k to 5k", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "dmitry@hudsonville.com", domain: "hudsonville.com", company: "Hudsonville", geo: "US", cpc: 3, stage: "—", priority: 3, abm: "DoNotTarget", industry: "Food & Bev", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "sarah@techcorp.uk", domain: "techcorp.uk", company: "TechCorp UK", geo: "UK", cpc: 8, stage: "Decision", priority: 9, abm: "Target", industry: "Software", size: "201 to 500", hq: "United Kingdom", linkedin: "https://linkedin.com/..." },
+            { email: "james@auslogistics.com", domain: "auslogistics.com", company: "Aus Logistics", geo: "AU", cpc: 6, stage: "Interest", priority: 7, abm: "Target", industry: "Logistics", size: "501 to 1k", hq: "Australia", linkedin: "https://linkedin.com/..." },
+            { email: "clara@berlinauto.de", domain: "berlinauto.de", company: "Berlin Automotive", geo: "DE", cpc: 7, stage: "Awareness", priority: 5, abm: "DoNotTarget", industry: "Automotive", size: "10k+", hq: "Germany", linkedin: "https://linkedin.com/..." },
+            { email: "jean@parisretail.fr", domain: "parisretail.fr", company: "Paris Retail Group", geo: "FR", cpc: 2, stage: "Consideration", priority: 4, abm: "Target", industry: "Retail", size: "51 to 200", hq: "France", linkedin: "https://linkedin.com/..." },
+            { email: "kenji@tokyofinance.jp", domain: "tokyofinance.jp", company: "Tokyo Finance", geo: "JP", cpc: 10, stage: "Decision", priority: 10, abm: "Target", industry: "Finance", size: "1k to 5k", hq: "Japan", linkedin: "https://linkedin.com/..." },
+            { email: "arun@indiatech.in", domain: "indiatech.in", company: "India Tech Solutions", geo: "IN", cpc: 1, stage: "Interest", priority: 6, abm: "Target", industry: "IT Services", size: "201 to 500", hq: "India", linkedin: "https://linkedin.com/..." },
+            { email: "mia@globalhealth.com", domain: "globalhealth.com", company: "Global Health", geo: "US", cpc: 9, stage: "Consideration", priority: 8, abm: "Target", industry: "Healthcare", size: "5k to 10k", hq: "United States", linkedin: "https://linkedin.com/..." },
+            { email: "lucas@brazilagri.br", domain: "brazilagri.br", company: "Brazil Agriculture", geo: "BR", cpc: 4, stage: "Awareness", priority: 5, abm: "DoNotTarget", industry: "Agriculture", size: "501 to 1k", hq: "Brazil", linkedin: "https://linkedin.com/..." },
+            { email: "olivia@canadamining.ca", domain: "canadamining.ca", company: "Canada Mining Corp", geo: "CA", cpc: 7, stage: "Decision", priority: 9, abm: "Target", industry: "Mining", size: "10k+", hq: "Canada", linkedin: "https://linkedin.com/..." },
+            { email: "liam@dublintech.ie", domain: "dublintech.ie", company: "Dublin Tech", geo: "IE", cpc: 6, stage: "—", priority: 4, abm: "DoNotTarget", industry: "Software", size: "11 to 50", hq: "Ireland", linkedin: "https://linkedin.com/..." }
+        ];
+
+        let talLists = [
+            {
+                id: "tal-1",
+                name: "TAL 1",
+                active: true,
+                leads: ["nhassociates.com", "rdsi.com", "hiya.com"],
+                savedFilters: null
+            },
+            {
+                id: "tal-2",
+                name: "TAL 2",
+                active: false,
+                leads: ["groupon.com", "mativ.com", "hunterhealth.com"],
+                savedFilters: null
+            },
+            {
+                id: "tal-3",
+                name: "TAL 3",
+                active: true,
+                leads: ["techcorp.uk", "auslogistics.com", "berlinauto.de", "parisretail.fr", "tokyofinance.jp", "indiatech.in", "globalhealth.com", "brazilagri.br", "canadamining.ca", "dublintech.ie"],
+                savedFilters: null
+            }
+        ];
+
+        // --- State ---
+        let currentTab = 'Mix';
+        let filtersApplied = false; 
+        
+        // --- 2. DOM Elements ---
+        const els = {
+            tableBody: document.getElementById('tableBody'),
+            talContainer: document.getElementById('talListContainer'),
+            addTalBtn: document.getElementById('addTalBtn'),
+            uploadTalBtn: document.getElementById('uploadTalBtn'),
+            addTalForm: document.getElementById('addTalForm'),
+            cancelTalBtn: document.getElementById('cancelTalBtn'),
+            saveTalBtn: document.getElementById('saveTalBtn'),
+            newTalNameInput: document.getElementById('newTalNameInput'),
+            
+            // Sidebar Inputs
+            sideTalAbm: document.getElementsByName('sideTalAbm'),
+            sideTalStatus: document.getElementsByName('sideTalStatus'),
+            
+            // Dashboard Inputs
+            emailMode: document.getElementsByName('emailMode'),
+            domainMode: document.getElementsByName('domainMode'),
+            companyMode: document.getElementsByName('companyMode'),
+            geoMode: document.getElementById('geoMode'),
+            geoInput: document.getElementById('geoInput'),
+            priMin: document.getElementById('priMin'),
+            priMax: document.getElementById('priMax'),
+            cpcMode: document.getElementById('cpcMode'),
+            cpcInput: document.getElementById('cpcInput'),
+            stageCbs: document.querySelectorAll('.stage-cb'),
+            stageBtnText: document.getElementById('stageBtnText'),
+            clearStagesBtn: document.getElementById('clearStagesBtn'),
+            abmFilter: document.getElementsByName('abmFilter'),
+            
+            // Buttons
+            resetBtn: document.getElementById('resetBtn'),
+            applyBtn: document.getElementById('applyBtn'),
+
+            // Metrics
+            mTotal: document.getElementById('metricTotal'),
+            mTarget: document.getElementById('metricTarget'),
+            mNotTarget: document.getElementById('metricNotTarget')
+        };
+
+        // --- 3. Core Functions ---
+
+        function init() {
+            bindEvents();
+            renderTals();
+            applyFilterEngine();
+        }
+
+        function showToast(msg) {
+            document.getElementById('appToastMessage').innerHTML = `<i class="fa-solid fa-terminal me-2 text-info"></i> ${msg}`;
+            const toast = new bootstrap.Toast(document.getElementById('appToast'));
+            toast.show();
+        }
+
+        function getRadioVal(nodeList) {
+            for (let node of nodeList) { if (node.checked) return node.value; }
+            return null;
+        }
+
+        function setRadioVal(nodeList, val) {
+            for (let node of nodeList) {
+                if (node.value === val) { node.checked = true; break; }
+            }
+        }
+
+        function getSelectedStages() {
+            return Array.from(els.stageCbs).filter(cb => cb.checked).map(cb => cb.value);
+        }
+
+        function updateStageText() {
+            const stages = getSelectedStages();
+            if (stages.length === 0) els.stageBtnText.innerText = "All Stages";
+            else if (stages.length <= 2) els.stageBtnText.innerText = stages.join(", ");
+            else els.stageBtnText.innerText = `${stages.length} Stages Selected`;
+        }
+
+        // --- UI Interactions ---
+        function bindEvents() {
+            // TAL Add Logic
+            els.addTalBtn.addEventListener('click', () => els.addTalForm.classList.remove('d-none'));
+            els.cancelTalBtn.addEventListener('click', () => { els.addTalForm.classList.add('d-none'); els.newTalNameInput.value = ''; });
+            els.saveTalBtn.addEventListener('click', () => {
+                const name = els.newTalNameInput.value.trim();
+                if (name) {
+                    talLists.push({ id: 'tal-' + Date.now(), name, active: true, leads: [], savedFilters: null });
+                    els.addTalForm.classList.add('d-none');
+                    els.newTalNameInput.value = '';
+                    renderTals();
+                    showToast("Module registered successfully");
+                }
+            });
+            els.newTalNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') els.saveTalBtn.click(); });
+            
+            // TAL Upload Logic
+            els.uploadTalBtn.addEventListener('click', () => {
+                const newId = 'tal-' + Date.now();
+                talLists.push({ id: newId, name: "Data_Stream_" + newId.substring(newId.length - 4), active: true, leads: ["rdsi.com", "groupon.com", "hudsonville.com"], savedFilters: null });
+                renderTals();
+                showToast("External data uplink complete");
+            });
+
+            // Live Filter Triggers
+            const liveInputs = [
+                ...els.sideTalAbm, ...els.sideTalStatus, ...els.emailMode, ...els.domainMode, ...els.companyMode,
+                els.geoMode, els.geoInput, els.priMin, els.priMax, els.cpcMode, els.cpcInput, ...els.abmFilter
+            ];
+            liveInputs.forEach(input => {
+                input.addEventListener('change', applyFilterEngine);
+                if (input.type === 'text' || input.type === 'number') input.addEventListener('input', applyFilterEngine);
+            });
+            els.stageCbs.forEach(cb => cb.addEventListener('change', () => { updateStageText(); applyFilterEngine(); }));
+            els.clearStagesBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                els.stageCbs.forEach(cb => cb.checked = false);
+                updateStageText();
+                applyFilterEngine();
+            });
+
+            
+            // Bind Tabs
+            const tabBtns = document.querySelectorAll('#dataTabs .nav-link');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.color = 'var(--text-muted)';
+                    });
+                    e.target.classList.add('active');
+                    e.target.style.color = 'var(--neon-cyan)';
+                    currentTab = e.target.getAttribute('data-tab-value');
+                    applyFilterEngine();
+                });
+            });
+
+            // Controls
+            els.resetBtn.addEventListener('click', () => {
+                setRadioVal(els.sideTalAbm, 'Yes');
+                setRadioVal(els.sideTalStatus, 'Active');
+                setRadioVal(els.emailMode, 'Include');
+                setRadioVal(els.domainMode, 'Include');
+                setRadioVal(els.companyMode, 'Include');
+                els.geoMode.value = 'Include'; els.geoInput.value = '';
+                els.priMin.value = ''; els.priMax.value = '';
+                els.cpcMode.value = 'Include'; els.cpcInput.value = '';
+                els.stageCbs.forEach(cb => cb.checked = false); updateStageText();
+                setRadioVal(els.abmFilter, 'All');
+                
+                currentTab = 'Mix'; document.getElementById('mix-tab').click();
+                filtersApplied = false;
+                renderTals();
+                applyFilterEngine();
+                showToast("System cache purged");
+            });
+
+            els.applyBtn.addEventListener('click', () => {
+                filtersApplied = true;
+                applyFilterEngine();
+                showToast("Data fetch cycle executed");
+            });
+        }
+
+        // --- TAL Management ---
+        function renderTals() {
+            els.talContainer.innerHTML = '';
+            talLists.forEach((tal, index) => {
+                const isSelected = tal.active;
+                const activeCls = tal.active ? 'active' : 'inactive';
+                
+                const div = document.createElement('div');
+                div.className = `tal-list-item ${isSelected ? 'selected' : ''}`;
+                
+                div.innerHTML = `
+                    <div class="form-check form-switch m-0 me-2" onclick="event.stopPropagation();" title="Toggle Active Status">
+                        <input class="form-check-input tal-active-toggle" type="checkbox" style="cursor: pointer; margin-top: 0.15rem;" ${tal.active ? 'checked' : ''}>
+                    </div>
+                    <div class="text-truncate fw-semibold" style="max-width: 140px;">${tal.name}</div>
+                    <div class="tal-actions dropdown ms-auto" onclick="event.stopPropagation();">
+                        <button class="btn btn-link btn-sm text-dark-50 p-0" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical px-2"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end shadow" style="font-size: 12px;">
+                            <li><a class="dropdown-item clone-tal" href="#"><i class="fa-solid fa-clone me-2 text-info w-15px"></i> Duplicate</a></li>
+                            <li><a class="dropdown-item edit-tal" href="#"><i class="fa-solid fa-pen-nib me-2 text-warning w-15px"></i> Rename</a></li>
+                            <li><a class="dropdown-item save-tal" href="#"><i class="fa-solid fa-microchip me-2 text-success w-15px"></i> Save Filters</a></li>
+                            <li><hr class="dropdown-divider border-secondary"></li>
+                            <li><a class="dropdown-item text-danger delete-tal" href="#"><i class="fa-solid fa-skull me-2 w-15px"></i> Delete</a></li>
+                        </ul>
+                    </div>
+                `;
+
+                div.addEventListener('click', () => {
+                    talLists[index].active = !talLists[index].active;
+                    if (talLists[index].active && tal.savedFilters) loadSavedFilters(tal.savedFilters);
+                    renderTals();
+                    applyFilterEngine();
+                });
+
+                div.querySelector('.tal-active-toggle').addEventListener('change', (e) => {
+                    e.stopPropagation();
+                    talLists[index].active = e.target.checked;
+                    renderTals(); applyFilterEngine();
+                });
+
+                const menu = div.querySelector('.dropdown-menu');
+                menu.querySelector('.clone-tal').addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const clone = JSON.parse(JSON.stringify(tal));
+                    clone.id = 'tal-' + Date.now();
+                    clone.name = clone.name + ' (Copy)';
+                    talLists.push(clone);
+                    renderTals(); showToast("Module duplicated");
+                });
+                menu.querySelector('.edit-tal').addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    const newName = prompt("Rename Module:", tal.name);
+                    if (newName) { talLists[index].name = newName; renderTals(); }
+                });
+                menu.querySelector('.save-tal').addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    saveFilterTal(tal.id);
+                });
+                menu.querySelector('.delete-tal').addEventListener('click', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if(confirm(`Delete module ${tal.name}?`)) {
+                        talLists.splice(index, 1);
+                        renderTals(); applyFilterEngine(); showToast("Module terminated");
+                    }
+                });
+
+                els.talContainer.appendChild(div);
+            });
+        }
+
+        function saveFilterTal(id) {
+            const tal = talLists.find(t => t.id === id);
+            if (!tal) return;
+            tal.savedFilters = {
+                geoMode: els.geoMode.value, geoInput: els.geoInput.value,
+                priMin: els.priMin.value, priMax: els.priMax.value,
+                cpcMode: els.cpcMode.value, cpcInput: els.cpcInput.value,
+                abmFilter: getRadioVal(els.abmFilter),
+                selectedStages: getSelectedStages(),
+                emailMode: getRadioVal(els.emailMode),
+                domainMode: getRadioVal(els.domainMode),
+                companyMode: getRadioVal(els.companyMode)
+            };
+            showToast(`Logic config written to ${tal.name}`);
+        }
+
+        function loadSavedFilters(f) {
+            els.geoMode.value = f.geoMode || 'Include';
+            els.geoInput.value = f.geoInput || '';
+            els.priMin.value = f.priMin || '';
+            els.priMax.value = f.priMax || '';
+            els.cpcMode.value = f.cpcMode || 'Include';
+            els.cpcInput.value = f.cpcInput || '';
+            setRadioVal(els.abmFilter, f.abmFilter || 'All');
+            
+            els.stageCbs.forEach(cb => cb.checked = f.selectedStages && f.selectedStages.includes(cb.value));
+            updateStageText();
+
+            setRadioVal(els.emailMode, f.emailMode || 'Include');
+            setRadioVal(els.domainMode, f.domainMode || 'Include');
+            setRadioVal(els.companyMode, f.companyMode || 'Include');
+        }
+
+        // --- Filter Engines ---
+        
+        function evaluateMultiValue(leadVal, rawInput, mode) {
+            if (!rawInput.trim()) return true;
+            const terms = rawInput.toLowerCase().split(',').map(s => s.trim()).filter(s => s);
+            const val = leadVal.toString().toLowerCase();
+            const match = terms.some(t => val.includes(t));
+            return mode === 'Include' ? match : !match;
+        }
+
+        function getHighlightContext() {
+            return {
+                geoM: els.geoMode.value, geoI: els.geoInput.value.trim(),
+                pMin: els.priMin.value, pMax: els.priMax.value,
+                cpcM: els.cpcMode.value, cpcI: els.cpcInput.value,
+                stages: getSelectedStages(),
+                abmF: getRadioVal(els.abmFilter)
+            };
+        }
+
+        function passesHighlightFilters(l, ctx) {
+            if (ctx.geoI && !evaluateMultiValue(l.geo, ctx.geoI, ctx.geoM)) return false;
+            if (ctx.cpcI) {
+                const inputNum = parseFloat(ctx.cpcI);
+                const isMatch = l.cpc === inputNum;
+                if (ctx.cpcM === 'Include' && !isMatch) return false;
+                if (ctx.cpcM === 'Exclude' && isMatch) return false;
+            }
+            if (ctx.pMin && l.priority < parseInt(ctx.pMin)) return false;
+            if (ctx.pMax && l.priority > parseInt(ctx.pMax)) return false;
+            if (ctx.stages.length > 0 && !ctx.stages.includes(l.stage)) return false;
+            if (ctx.abmF !== 'All' && l.abm !== ctx.abmF) return false;
+            return true;
+        }
+
+        function hasAnyHighlightRuleActive(ctx) {
+            return ctx.geoI !== '' || ctx.cpcI !== '' || ctx.pMin !== '' || ctx.pMax !== '' || ctx.stages.length > 0 || ctx.abmF !== 'All';
+        }
+
+        function applyFilterEngine() {
+            const activeTals = talLists.filter(t => t.active);
+            const mixTabBtn = document.getElementById('mix-tab');
+            if(mixTabBtn) {
+                if(activeTals.length === 0) mixTabBtn.innerText = "Mix Active TALs (0)";
+                else if(activeTals.length <= 2) mixTabBtn.innerText = "Mix: " + activeTals.map(t => t.name).join(' & ');
+                else mixTabBtn.innerText = `Mix Active TALs (${activeTals.length})`;
+            }
+
+            // 1. Row Visibility
+            const sideAbm = getRadioVal(els.sideTalAbm);
+            const sideStatus = getRadioVal(els.sideTalStatus);
+            
+            const activeDomains = new Set();
+            activeTals.forEach(t => t.leads.forEach(d => activeDomains.add(d)));
+
+            let visibleLeads = dummyLeads.filter(l => {
+                if (activeTals.length === 0) return false;
+                if (!activeDomains.has(l.domain)) return false;
+                if (sideAbm === 'No' && l.abm === 'Target') return false;
+                if (sideStatus === 'Inactive' && l.priority > 2) return false;
+                return true;
+            });
+
+            // Set Meta Columns state
+            const metaCols = document.querySelectorAll('.meta-col');
+            const leadsTable = document.getElementById('leadsTable');
+            if (filtersApplied) {
+                metaCols.forEach(c => c.classList.remove('col-hidden'));
+                leadsTable.classList.add('data-fetched');
+            } else {
+                metaCols.forEach(c => c.classList.add('col-hidden'));
+                leadsTable.classList.remove('data-fetched');
+            }
+
+            // Exclusion Styling
+            document.getElementById('th-email').classList.toggle('col-greyed', getRadioVal(els.emailMode) === 'Exclude');
+            document.getElementById('th-domain').classList.toggle('col-greyed', getRadioVal(els.domainMode) === 'Exclude');
+            document.getElementById('th-company').classList.toggle('col-greyed', getRadioVal(els.companyMode) === 'Exclude');
+
+            // 2. Highlighting
+            const ctx = getHighlightContext();
+            const rulesActive = hasAnyHighlightRuleActive(ctx);
+
+            if (currentTab === 'Filtered') {
+                visibleLeads = visibleLeads.filter(l => passesHighlightFilters(l, ctx));
+            }
+
+            renderRows(visibleLeads, ctx, rulesActive);
+            
+            // Metrics
+            els.mTotal.innerText = visibleLeads.length;
+            els.mTarget.innerText = visibleLeads.filter(l => l.abm === 'Target').length;
+            els.mNotTarget.innerText = visibleLeads.filter(l => l.abm === 'DoNotTarget').length;
+        }
+
+        // --- Render Engine ---
+
+        function getStageBadge(stage) {
+            if (stage === 'Awareness') return `<span class="badge-stage badge-awareness">Awareness</span>`;
+            if (stage === 'Consideration') return `<span class="badge-stage badge-consideration">Consideration</span>`;
+            if (stage === 'Decision') return `<span class="badge-stage badge-decision">Decision</span>`;
+            if (stage === 'Interest') return `<span class="badge-stage badge-interest">Interest</span>`;
+            return `—`;
+        }
+
+        function getPriDot(pri) {
+            if (pri <= 2) return `<span class="pri-dot pri-red"></span>`;
+            if (pri <= 4) return `<span class="pri-dot pri-amber"></span>`;
+            if (pri <= 7) return `<span class="pri-dot pri-blue"></span>`;
+            return `<span class="pri-dot pri-green"></span>`;
+        }
+
+        function getAbmBadge(abm) {
+            if (abm === 'Target') return `<span class="badge-abm badge-target">Target</span>`;
+            if (abm === 'DoNotTarget') return `<span class="badge-abm badge-notarget">Do Not Target</span>`;
+            return `—`;
+        }
+
+        function renderRows(list, ctx, rulesActive) {
+            els.tableBody.innerHTML = '';
+            
+            const emGrey = getRadioVal(els.emailMode) === 'Exclude' ? 'col-greyed' : '';
+            const domGrey = getRadioVal(els.domainMode) === 'Exclude' ? 'col-greyed' : '';
+            const comGrey = getRadioVal(els.companyMode) === 'Exclude' ? 'col-greyed' : '';
+
+            list.forEach(l => {
+                const tr = document.createElement('tr');
+                
+                let isMatch = false;
+                if (rulesActive) {
+                    isMatch = passesHighlightFilters(l, ctx);
+                    if (isMatch) tr.classList.add('row-highlight');
+                }
+
+                const dashValues = filtersApplied && rulesActive && !isMatch;
+                const linkVal = `<a href="${l.linkedin}" style="color: var(--neon-cyan)" target="_blank"><i class="fa-brands fa-linkedin fs-5"></i></a>`;
+
+                const vIndustry = dashValues ? '—' : l.industry;
+                const vSize = dashValues ? '—' : l.size;
+                const vHq = dashValues ? '—' : l.hq;
+                const vLink = dashValues ? '—' : linkVal;
+
+                tr.innerHTML = `
+                    <td class="${emGrey} fw-medium"><a href="mailto:${l.email}" class="email-link">${l.email}</a></td>
+                    <td class="${domGrey}">${l.domain}</td>
+                    <td class="${comGrey} fw-semibold" style="color: var(--text-main)">${l.company}</td>
+                    <td><span class="geo-badge">${l.geo}</span></td>
+                    <td><span style="color: var(--neon-amber)">${l.cpc}</span></td>
+                    <td>${getStageBadge(l.stage)}</td>
+                    <td class="fw-bold">${getPriDot(l.priority)} ${l.priority}</td>
+                    <td>${getAbmBadge(l.abm)}</td>
+                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-muted">${vIndustry}</td>
+                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-muted">${vSize}</td>
+                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-muted">${vHq}</td>
+                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-center">${vLink}</td>
+                `;
+                els.tableBody.appendChild(tr);
+            });
+
+            if (list.length === 0) {
+                els.tableBody.innerHTML = `<tr><td colspan="12" class="text-center py-5 text-muted"><i class="fa-solid fa-ghost fs-1 mb-3 opacity-50"></i><br>No signals detected on this frequency.</td></tr>`;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
