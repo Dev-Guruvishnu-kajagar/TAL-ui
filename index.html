@@ -431,13 +431,14 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-microchip me-2" style="color: var(--neon-cyan)"></i> TAL Config</h6>
                 <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-dark fw-semibold px-3 rounded-pill py-0 " style="height:20px; line-height:1; font-size: 12px;" id="saveFilterBtn">Save Filter</button>
                     <button class="btn btn-sm btn-outline-dark fw-semibold px-3 rounded-pill py-0 " style="height:20px; line-height:1; font-size: 12px;" id="resetBtn">Reset All</button>
                     <button class="btn btn-sm btn-glow fw-bold px-3 rounded-pill shadow-sm py-0" style="height:20px; line-height:1;font-size: 12px;" id="applyBtn">Fetch TAL</button>
                 </div>
             </div>
 
             <!-- Compact UI Layout -->
-            <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
                 
                 <!-- Modes Group -->
                 <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
@@ -531,21 +532,31 @@
                 </div>
 
             </div>
+            </div>
+            
+            <!-- Saved Filters Chips -->
+            <div id="savedFiltersContainer" class="d-flex flex-wrap gap-2 mt-2 empty-d-none"></div>
         </div>
-
 
         <!-- Data Table -->
         <div class="glass-panel table-container">
             <!-- New Tab Navigation -->
-            <ul class="nav nav-tabs border-0 px-3 pt-3 mb-0" id="dataTabs" role="tablist" style="background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.05) !important;">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold" id="mix-tab" data-bs-toggle="tab" data-tab-value="Mix" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-main); font-size: 13px; padding-bottom: 12px;">Mix Active TALs</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold" id="filtered-tab" data-bs-toggle="tab" data-tab-value="Filtered" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font-size: 13px; padding-bottom: 12px;">Filtered Data</button>
-                </li>
-
-            </ul>
+            <div class="d-flex justify-content-between align-items-center px-3 pt-3" style="background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.05) !important;">
+                <ul class="nav nav-tabs border-0 mb-0" id="dataTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="tab-complete" data-tab-value="Complete" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-main); font-size: 13px; padding-bottom: 12px;" disabled>View Complete TAL</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="tab-filtered" data-tab-value="Filtered" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font-size: 13px; padding-bottom: 12px;" disabled>View Filtered TAL</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="tab-mapped" data-tab-value="Mapped" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font-size: 13px; padding-bottom: 12px;" disabled>View Mapped TAL</button>
+                    </li>
+                </ul>
+                <div class="d-flex gap-2 pb-2">
+                    <button class="btn btn-sm btn-outline-secondary" id="exportLeadsBtn" style="font-size: 11px;"><i class="fa-solid fa-file-export me-1"></i> Export Leads</button>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-glass" id="leadsTable">
                     <thead>
@@ -568,6 +579,14 @@
                         <!-- Rows injected via JS -->
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Pagination Footer -->
+            <div class="d-flex justify-content-between align-items-center p-3 border-top" style="border-color: rgba(0,0,0,0.05) !important;">
+                <div class="text-muted" style="font-size: 12px;" id="pageInfo">Showing 0 to 0 of 0 entries</div>
+                <div class="d-flex gap-1" id="paginationControls">
+                    <!-- Pagination injected via JS -->
+                </div>
             </div>
         </div>
     </div>
@@ -609,8 +628,13 @@
                     <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width:26px; height:26px; background: var(--neon-cyan); color: #fff; border: none;" id="addTalBtn" title="Add List"><i class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
                 </div>
                 
-                <button class="btn btn-glow btn-sm border-dashed mb-3 w-100 text-start rounded-3" id="uploadTalBtn">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload TAL
+                <button class="btn btn-glow btn-sm border-dashed mb-2 w-100 text-start rounded-3" id="uploadTalBtn">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload TAL (.csv)
+                </button>
+                <input type="file" id="csvFileInput" accept=".csv" class="d-none">
+                
+                <button class="btn btn-outline-secondary btn-sm mb-3 w-100 text-start rounded-3" id="downloadSampleBtn">
+                    <i class="fa-solid fa-download me-2"></i> Download Sample File
                 </button>
                 
                                 <div id="addTalForm" class="d-none mb-3 p-3 glass-inner shadow-sm rounded-3">
@@ -700,8 +724,12 @@
         ];
 
         // --- State ---
-        let currentTab = 'Mix';
+        let currentTab = 'Complete';
         let filtersApplied = false; 
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let visibleLeadsCache = [];
+        let savedGlobalFilters = [];
         
         // --- 2. DOM Elements ---
         const els = {
@@ -709,6 +737,13 @@
             talContainer: document.getElementById('talListContainer'),
             addTalBtn: document.getElementById('addTalBtn'),
             uploadTalBtn: document.getElementById('uploadTalBtn'),
+            csvFileInput: document.getElementById('csvFileInput'),
+            downloadSampleBtn: document.getElementById('downloadSampleBtn'),
+            exportLeadsBtn: document.getElementById('exportLeadsBtn'),
+            saveFilterBtn: document.getElementById('saveFilterBtn'),
+            savedFiltersContainer: document.getElementById('savedFiltersContainer'),
+            paginationControls: document.getElementById('paginationControls'),
+            pageInfo: document.getElementById('pageInfo'),
             addTalForm: document.getElementById('addTalForm'),
             cancelTalBtn: document.getElementById('cancelTalBtn'),
             saveTalBtn: document.getElementById('saveTalBtn'),
@@ -749,12 +784,18 @@
             bindEvents();
             renderTals();
             applyFilterEngine();
+            setupDragAndDrop();
         }
 
         function showToast(msg) {
             document.getElementById('appToastMessage').innerHTML = `<i class="fa-solid fa-terminal me-2 text-info"></i> ${msg}`;
             const toast = new bootstrap.Toast(document.getElementById('appToast'));
             toast.show();
+        }
+
+        function generateMockLeads(count) {
+            const shuffled = [...dummyLeads].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count).map(l => l.domain);
         }
 
         function getRadioVal(nodeList) {
@@ -787,22 +828,27 @@
             els.saveTalBtn.addEventListener('click', () => {
                 const name = els.newTalNameInput.value.trim();
                 if (name) {
-                    talLists.push({ id: 'tal-' + Date.now(), name, active: true, leads: [], savedFilters: null });
+                    talLists.push({ id: 'tal-' + Date.now(), name, active: true, leads: generateMockLeads(10), savedFilters: null });
                     els.addTalForm.classList.add('d-none');
                     els.newTalNameInput.value = '';
                     renderTals();
-                    showToast("Module registered successfully");
+                    applyFilterEngine();
+                    showToast("Module registered successfully with 10 random leads");
                 }
             });
             els.newTalNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') els.saveTalBtn.click(); });
             
             // TAL Upload Logic
-            els.uploadTalBtn.addEventListener('click', () => {
-                const newId = 'tal-' + Date.now();
-                talLists.push({ id: newId, name: "Data_Stream_" + newId.substring(newId.length - 4), active: true, leads: ["rdsi.com", "groupon.com", "hudsonville.com"], savedFilters: null });
-                renderTals();
-                showToast("External data uplink complete");
+            els.uploadTalBtn.addEventListener('click', () => els.csvFileInput.click());
+            els.csvFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) handleTalUpload(file.name);
+                els.csvFileInput.value = ''; // reset
             });
+
+            // File Download & Export
+            els.downloadSampleBtn.addEventListener('click', () => showToast("Sample file downloaded successfully!"));
+            els.exportLeadsBtn.addEventListener('click', () => showToast("Leads exported successfully!"));
 
             // Live Filter Triggers
             const liveInputs = [
@@ -821,7 +867,6 @@
                 applyFilterEngine();
             });
 
-            
             // Bind Tabs
             const tabBtns = document.querySelectorAll('#dataTabs .nav-link');
             tabBtns.forEach(btn => {
@@ -831,7 +876,7 @@
                         b.style.color = 'var(--text-muted)';
                     });
                     e.target.classList.add('active');
-                    e.target.style.color = 'var(--neon-cyan)';
+                    e.target.style.color = 'var(--text-main)';
                     currentTab = e.target.getAttribute('data-tab-value');
                     applyFilterEngine();
                 });
@@ -850,8 +895,14 @@
                 els.stageCbs.forEach(cb => cb.checked = false); updateStageText();
                 setRadioVal(els.abmFilter, 'All');
                 
-                currentTab = 'Mix'; document.getElementById('mix-tab').click();
                 filtersApplied = false;
+                
+                // Disable tabs, set Complete tab as active
+                tabBtns.forEach(b => b.disabled = true);
+                const completeTab = document.getElementById('tab-complete');
+                completeTab.disabled = false;
+                completeTab.click();
+
                 renderTals();
                 applyFilterEngine();
                 showToast("System cache purged");
@@ -859,8 +910,92 @@
 
             els.applyBtn.addEventListener('click', () => {
                 filtersApplied = true;
+                // Enable view modes
+                tabBtns.forEach(b => b.disabled = false);
                 applyFilterEngine();
                 showToast("Data fetch cycle executed");
+            });
+
+            // Save Filters Preset
+            els.saveFilterBtn.addEventListener('click', () => {
+                const name = prompt("Enter a name for this filter preset:");
+                if (name && name.trim()) {
+                    savedGlobalFilters.push({
+                        id: 'preset-' + Date.now(),
+                        name: name.trim(),
+                        filters: {
+                            geoMode: els.geoMode.value, geoInput: els.geoInput.value,
+                            priMin: els.priMin.value, priMax: els.priMax.value,
+                            cpcMode: els.cpcMode.value, cpcInput: els.cpcInput.value,
+                            abmFilter: getRadioVal(els.abmFilter),
+                            selectedStages: getSelectedStages(),
+                            emailMode: getRadioVal(els.emailMode),
+                            domainMode: getRadioVal(els.domainMode),
+                            companyMode: getRadioVal(els.companyMode)
+                        }
+                    });
+                    renderFilterChips();
+                    showToast(`Filter preset "${name.trim()}" saved.`);
+                }
+            });
+        }
+
+        function setupDragAndDrop() {
+            document.body.addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); });
+            document.body.addEventListener('drop', e => {
+                e.preventDefault(); e.stopPropagation();
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.name.endsWith('.csv')) {
+                        handleTalUpload(file.name);
+                    } else {
+                        showToast("Please upload a valid .csv file.");
+                    }
+                }
+            });
+        }
+
+        function handleTalUpload(filename) {
+            const talName = filename.replace('.csv', '');
+            const newId = 'tal-' + Date.now();
+            talLists.push({ id: newId, name: talName, active: true, leads: generateMockLeads(10), savedFilters: null });
+            renderTals();
+            applyFilterEngine();
+            showToast(`External data uplink complete. TAL "${talName}" created with custom leads.`);
+        }
+
+        // --- Saved Filters Presets ---
+        function renderFilterChips() {
+            els.savedFiltersContainer.innerHTML = '';
+            if (savedGlobalFilters.length === 0) {
+                els.savedFiltersContainer.classList.add('empty-d-none');
+                return;
+            }
+            els.savedFiltersContainer.classList.remove('empty-d-none');
+            
+            savedGlobalFilters.forEach((preset, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'badge bg-light text-dark border d-flex align-items-center p-2 shadow-sm rounded-pill';
+                chip.style.cursor = 'pointer';
+                chip.innerHTML = `
+                    <i class="fa-solid fa-filter me-2 text-primary"></i> <span class="me-2 fw-medium">${preset.name}</span>
+                    <button class="btn-close ms-2" style="font-size: 8px;"></button>
+                `;
+                
+                chip.querySelector('span').addEventListener('click', () => {
+                    loadSavedFilters(preset.filters);
+                    applyFilterEngine();
+                    showToast(`Applied preset "${preset.name}"`);
+                });
+
+                chip.querySelector('.btn-close').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    savedGlobalFilters.splice(index, 1);
+                    renderFilterChips();
+                    showToast(`Preset deleted.`);
+                });
+
+                els.savedFiltersContainer.appendChild(chip);
             });
         }
 
@@ -869,7 +1004,6 @@
             els.talContainer.innerHTML = '';
             talLists.forEach((tal, index) => {
                 const isSelected = tal.active;
-                const activeCls = tal.active ? 'active' : 'inactive';
                 
                 const div = document.createElement('div');
                 div.className = `tal-list-item ${isSelected ? 'selected' : ''}`;
@@ -883,17 +1017,14 @@
                         <button class="btn btn-link btn-sm text-dark-50 p-0" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical px-2"></i></button>
                         <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end shadow" style="font-size: 12px;">
                             <li><a class="dropdown-item clone-tal" href="#"><i class="fa-solid fa-clone me-2 text-info w-15px"></i> Duplicate</a></li>
-                            <li><a class="dropdown-item edit-tal" href="#"><i class="fa-solid fa-pen-nib me-2 text-warning w-15px"></i> Rename</a></li>
-                            <li><a class="dropdown-item save-tal" href="#"><i class="fa-solid fa-microchip me-2 text-success w-15px"></i> Save Filters</a></li>
-                            <li><hr class="dropdown-divider border-secondary"></li>
-                            <li><a class="dropdown-item text-danger delete-tal" href="#"><i class="fa-solid fa-skull me-2 w-15px"></i> Delete</a></li>
+                            <li><a class="dropdown-item edit-tal" href="#"><i class="fa-solid fa-pen-nib me-2 text-warning w-15px"></i> Rename & Regen</a></li>
+                            ${tal.allowDelete !== false ? '<li><hr class="dropdown-divider border-secondary"></li><li><a class="dropdown-item text-danger delete-tal" href="#"><i class="fa-solid fa-skull me-2 w-15px"></i> Delete</a></li>' : ''}
                         </ul>
                     </div>
                 `;
 
                 div.addEventListener('click', () => {
                     talLists[index].active = !talLists[index].active;
-                    if (talLists[index].active && tal.savedFilters) loadSavedFilters(tal.savedFilters);
                     renderTals();
                     applyFilterEngine();
                 });
@@ -909,45 +1040,34 @@
                     e.preventDefault(); e.stopPropagation();
                     const clone = JSON.parse(JSON.stringify(tal));
                     clone.id = 'tal-' + Date.now();
-                    clone.name = clone.name + ' (Copy)';
+                    clone.name = 'Copy of ' + clone.name;
+                    clone.leads = generateMockLeads(10);
                     talLists.push(clone);
-                    renderTals(); showToast("Module duplicated");
+                    renderTals(); applyFilterEngine(); showToast("Module duplicated with unique dataset");
                 });
                 menu.querySelector('.edit-tal').addEventListener('click', (e) => {
                     e.preventDefault(); e.stopPropagation();
-                    const newName = prompt("Rename Module:", tal.name);
-                    if (newName) { talLists[index].name = newName; renderTals(); }
-                });
-                menu.querySelector('.save-tal').addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    saveFilterTal(tal.id);
-                });
-                menu.querySelector('.delete-tal').addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    if(confirm(`Delete module ${tal.name}?`)) {
-                        talLists.splice(index, 1);
-                        renderTals(); applyFilterEngine(); showToast("Module terminated");
+                    const newName = prompt("Rename Module (Will regenerate dataset and lock deletion):", tal.name);
+                    if (newName && newName !== tal.name) {
+                        talLists[index].name = newName;
+                        talLists[index].leads = generateMockLeads(10);
+                        talLists[index].allowDelete = false;
+                        renderTals(); applyFilterEngine();
+                        showToast("Module updated and locked");
                     }
                 });
+                if (tal.allowDelete !== false) {
+                    menu.querySelector('.delete-tal').addEventListener('click', (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        if(confirm(`Delete module ${tal.name}?`)) {
+                            talLists.splice(index, 1);
+                            renderTals(); applyFilterEngine(); showToast("Module terminated");
+                        }
+                    });
+                }
 
                 els.talContainer.appendChild(div);
             });
-        }
-
-        function saveFilterTal(id) {
-            const tal = talLists.find(t => t.id === id);
-            if (!tal) return;
-            tal.savedFilters = {
-                geoMode: els.geoMode.value, geoInput: els.geoInput.value,
-                priMin: els.priMin.value, priMax: els.priMax.value,
-                cpcMode: els.cpcMode.value, cpcInput: els.cpcInput.value,
-                abmFilter: getRadioVal(els.abmFilter),
-                selectedStages: getSelectedStages(),
-                emailMode: getRadioVal(els.emailMode),
-                domainMode: getRadioVal(els.domainMode),
-                companyMode: getRadioVal(els.companyMode)
-            };
-            showToast(`Logic config written to ${tal.name}`);
         }
 
         function loadSavedFilters(f) {
@@ -1008,13 +1128,7 @@
 
         function applyFilterEngine() {
             const activeTals = talLists.filter(t => t.active);
-            const mixTabBtn = document.getElementById('mix-tab');
-            if(mixTabBtn) {
-                if(activeTals.length === 0) mixTabBtn.innerText = "Mix Active TALs (0)";
-                else if(activeTals.length <= 2) mixTabBtn.innerText = "Mix: " + activeTals.map(t => t.name).join(' & ');
-                else mixTabBtn.innerText = `Mix Active TALs (${activeTals.length})`;
-            }
-
+            
             // 1. Row Visibility
             const sideAbm = getRadioVal(els.sideTalAbm);
             const sideStatus = getRadioVal(els.sideTalStatus);
@@ -1033,7 +1147,7 @@
             // Set Meta Columns state
             const metaCols = document.querySelectorAll('.meta-col');
             const leadsTable = document.getElementById('leadsTable');
-            if (filtersApplied) {
+            if (filtersApplied && currentTab !== 'Complete') {
                 metaCols.forEach(c => c.classList.remove('col-hidden'));
                 leadsTable.classList.add('data-fetched');
             } else {
@@ -1046,15 +1160,19 @@
             document.getElementById('th-domain').classList.toggle('col-greyed', getRadioVal(els.domainMode) === 'Exclude');
             document.getElementById('th-company').classList.toggle('col-greyed', getRadioVal(els.companyMode) === 'Exclude');
 
-            // 2. Highlighting
+            // 2. Highlighting & View Modes
             const ctx = getHighlightContext();
-            const rulesActive = hasAnyHighlightRuleActive(ctx);
 
-            if (currentTab === 'Filtered') {
+            if (currentTab === 'Mapped' && filtersApplied) {
+                // View Mapped TAL: Hides all non-matching rows entirely
                 visibleLeads = visibleLeads.filter(l => passesHighlightFilters(l, ctx));
             }
 
-            renderRows(visibleLeads, ctx, rulesActive);
+            // Save to cache for pagination
+            visibleLeadsCache = visibleLeads;
+            currentPage = 1;
+            renderPagination();
+            renderPage();
             
             // Metrics
             els.mTotal.innerText = visibleLeads.length;
@@ -1084,6 +1202,50 @@
             if (abm === 'DoNotTarget') return `<span class="badge-abm badge-notarget">Do Not Target</span>`;
             return `—`;
         }
+        
+        function renderPagination() {
+            const totalItems = visibleLeadsCache.length;
+            const totalPages = Math.ceil(totalItems / rowsPerPage);
+            
+            if (totalItems === 0) {
+                els.pageInfo.innerText = "Showing 0 to 0 of 0 entries";
+                els.paginationControls.innerHTML = "";
+                return;
+            }
+
+            const startIdx = (currentPage - 1) * rowsPerPage + 1;
+            const endIdx = Math.min(currentPage * rowsPerPage, totalItems);
+            els.pageInfo.innerText = `Showing ${startIdx} to ${endIdx} of ${totalItems} entries`;
+
+            let html = `
+                <button class="btn btn-sm btn-outline-secondary py-0" style="font-size: 11px;" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">Prev</button>
+            `;
+            for(let i = 1; i <= totalPages; i++) {
+                html += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-secondary'} py-0" style="font-size: 11px;" onclick="goToPage(${i})">${i}</button>`;
+            }
+            html += `
+                <button class="btn btn-sm btn-outline-secondary py-0" style="font-size: 11px;" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Next</button>
+            `;
+            
+            els.paginationControls.innerHTML = html;
+        }
+        
+        // Expose globally for onclick string
+        window.goToPage = function(page) {
+            currentPage = page;
+            renderPagination();
+            renderPage();
+        };
+
+        function renderPage() {
+            const startIdx = (currentPage - 1) * rowsPerPage;
+            const pageLeads = visibleLeadsCache.slice(startIdx, startIdx + rowsPerPage);
+            
+            const ctx = getHighlightContext();
+            const rulesActive = hasAnyHighlightRuleActive(ctx);
+            
+            renderRows(pageLeads, ctx, rulesActive);
+        }
 
         function renderRows(list, ctx, rulesActive) {
             els.tableBody.innerHTML = '';
@@ -1096,12 +1258,14 @@
                 const tr = document.createElement('tr');
                 
                 let isMatch = false;
-                if (rulesActive) {
+                if (rulesActive && filtersApplied && currentTab !== 'Complete') {
                     isMatch = passesHighlightFilters(l, ctx);
-                    if (isMatch) tr.classList.add('row-highlight');
+                    // In Filtered tab, matching rows are highlighted
+                    if (isMatch && currentTab === 'Filtered') tr.classList.add('row-highlight');
                 }
 
-                const dashValues = filtersApplied && rulesActive && !isMatch;
+                // Show dashes for non-matching rows in Filtered View
+                const dashValues = filtersApplied && rulesActive && !isMatch && currentTab === 'Filtered';
                 const linkVal = `<a href="${l.linkedin}" style="color: var(--neon-cyan)" target="_blank"><i class="fa-brands fa-linkedin fs-5"></i></a>`;
 
                 const vIndustry = dashValues ? '—' : l.industry;
@@ -1118,10 +1282,10 @@
                     <td>${getStageBadge(l.stage)}</td>
                     <td class="fw-bold">${getPriDot(l.priority)} ${l.priority}</td>
                     <td>${getAbmBadge(l.abm)}</td>
-                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-muted">${vIndustry}</td>
-                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-muted">${vSize}</td>
-                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-muted">${vHq}</td>
-                    <td class="meta-col ${filtersApplied ? '' : 'col-hidden'} text-center">${vLink}</td>
+                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-muted">${vIndustry}</td>
+                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-muted">${vSize}</td>
+                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-muted">${vHq}</td>
+                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-center">${vLink}</td>
                 `;
                 els.tableBody.appendChild(tr);
             });
@@ -1133,6 +1297,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', init);
+
 
     </script>
 </body>
