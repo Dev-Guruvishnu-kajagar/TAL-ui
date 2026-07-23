@@ -1,1304 +1,2827 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leads Filter Dashboard - Daybreak Edition</title>
-    <!-- Bootstrap 5.3.3 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome 6.5.1 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            
-            --neon-cyan: #0ea5e9;
-            --neon-pink: #ec4899;
-            --neon-green: #10b981;
-            --neon-amber: #f59e0b;
-            --text-main: #1e293b;
-            --text-muted: #475569;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Target Account List (TAL) - Leads Filter Dashboard</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-base: #0b0f19;
+      --bg-surface: #111827;
+      --bg-surface-elevated: #1f293d;
+      --bg-card: rgba(31, 41, 55, 0.6);
+      --bg-glass: rgba(17, 24, 39, 0.75);
+      
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #6366f1;
+      --border-accent: rgba(99, 102, 241, 0.3);
+      
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-light: rgba(99, 102, 241, 0.15);
+      
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --accent-blue-bg: rgba(59, 130, 246, 0.12);
+      --accent-blue-border: rgba(59, 130, 246, 0.35);
+      
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+      --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.25);
+      
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        /* --- Global Aesthetics --- */
-        body {
-            font-family: 'Inter', sans-serif;
-            letter-spacing: -0.01em;
-            margin: 0;
-            padding: 0;
-            color: var(--text-main);
-            min-height: 100vh;
-            background: linear-gradient(45deg, #e0f2fe, #f0fdf4, #fdf4ff, #eff6ff);
-            background-size: 400% 400%;
-            animation: gradientBG 20s ease infinite;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+    }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+    /* Top Navbar */
+    .header {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.5rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
 
-        /* --- Glassmorphism Utilities --- */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            box-shadow: var(--glass-shadow);
-        }
-        .glass-inner {
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
 
-        /* --- Navbar --- */
-        .top-navbar {
-            padding: 6px 16px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 0 0 16px 16px;
-        }
-        .brand-logo {
-            font-size: 16px;
-            font-weight: 800;
-            background: -webkit-linear-gradient(45deg, var(--neon-cyan), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 0.5px;
-        }
-        .metric-chip {
-            background: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            padding: 4px 12px;
-            text-align: center;
-            min-width: 100px;
-        }
-        .metric-val { font-size: 16px; font-weight: 800; }
-        .val-total { color: var(--text-main); }
-        .val-target { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,243,255,0.4); }
-        .val-notarget { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,0,234,0.4); }
-        
-        .btn-glow {
-            background: rgba(0, 243, 255, 0.1);
-            color: var(--neon-cyan);
-            border: 1px solid var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        .btn-glow:hover {
-            background: var(--neon-cyan);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
-        }
+    .brand-title-text {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 30%, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        /* --- Offcanvas Right Drawer (TAL Manager) --- */
-        .offcanvas-glass {
-            background: rgba(248, 250, 252, 0.85);
-            backdrop-filter: blur(24px);
-            border-left: 1px solid var(--glass-border);
-            color: var(--text-main);
-        }
-        .tal-list-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid transparent;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        .tal-list-item:hover {
-            background: rgba(255,255,255,0.08);
-        }
-        .tal-list-item.selected {
-            background: rgba(0, 243, 255, 0.1);
-            border-color: var(--neon-cyan);
-            color: var(--text-main);
-            box-shadow: 0 0 10px rgba(0,243,255,0.1);
-        }
-        .status-dot {
-            width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;
-        }
-        .status-dot.active { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
-        .status-dot.inactive { background: #475569; }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow-glow);
+    }
 
-        /* TAL Active Toggle */
-        .tal-active-toggle {
-            background-color: #ef4444 !important;
-            border-color: #ef4444 !important;
-            box-shadow: none !important;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
-        }
-        .tal-active-toggle:checked {
-            background-color: #10b981 !important;
-            border-color: #10b981 !important;
-        }
-        .tal-active-toggle:focus {
-            box-shadow: none !important;
-        }
-        
-        .tal-actions { opacity: 0; transition: opacity 0.2s; }
-        .tal-list-item:hover .tal-actions, .tal-actions.show { opacity: 1; }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
 
-        /* Stage Checkbox Fix */
-        .stage-cb {
-            cursor: pointer;
-        }
-        .stage-cb:checked {
-            background-color: var(--neon-cyan) !important;
-            border-color: var(--neon-cyan) !important;
-        }
-        .stage-cb:focus {
-            box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25) !important;
-            border-color: var(--neon-cyan) !important;
-        }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      user-select: none;
+      white-space: nowrap;
+      -webkit-text-fill-color: initial !important;
+    }
 
-        /* --- Filter Grid --- */
-        .filter-label {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.05em;
-            margin-bottom: 6px;
-            display: block;
-        }
-        
-        /* Segmented Controls */
-        .segmented-control {
-            display: flex;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 6px;
-            padding: 4px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        .segmented-control input[type="radio"] { display: none; }
-        .segmented-control label {
-            flex: 1; text-align: center; padding: 4px 8px;
-            font-size: 11px; font-weight: 600; cursor: pointer;
-            border-radius: 4px; transition: all 0.3s;
-            color: var(--text-muted); margin: 0;
-        }
-        .segmented-control input[type="radio"]:checked + label {
-            background: #fff;
-            color: var(--text-main);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+    .badge-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 0.2rem;
+    }
 
-        
-        .compact-toggle {
-            display: flex;
-            background: rgba(0,0,0,0.05);
-            border-radius: 12px;
-            padding: 2px;
-            border: 1px solid rgba(0,0,0,0.05);
-            width: 80px;
-        }
-        .compact-toggle input[type="radio"] { display: none; }
-        .compact-toggle label {
-            flex: 1; text-align: center; padding: 2px 0;
-            font-size: 10px; font-weight: 700; cursor: pointer;
-            border-radius: 10px; transition: all 0.3s;
-            color: var(--text-muted); margin: 0;
-        }
-        .compact-toggle input[type="radio"]:checked + label {
-            background: #fff;
-            color: var(--text-main);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+    .btn-sm {
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+    }
 
-        /* Form Inputs */
-        .form-control-glass {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0,0,0,0.1);
-            color: var(--text-main);
-            font-size: 12px;
-            border-radius: 6px;
-            padding: 6px 10px;
-            transition: all 0.2s;
-        }
-        .form-control-glass::placeholder { color: rgba(0,0,0,0.4); }
-        .form-control-glass:focus {
-            background: #fff;
-            border-color: var(--neon-cyan);
-            color: var(--text-main);
-            box-shadow: 0 0 8px rgba(14, 165, 233, 0.3);
-            outline: none;
-        }
-        select.form-control-glass option { background: #f8fafc; color: var(--text-main); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: white;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    }
 
-        .dropdown-menu-glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .dropdown-menu-glass .dropdown-item { color: var(--text-main); font-size: 13px; }
-        .dropdown-menu-glass .dropdown-item:hover { background: rgba(255,255,255,0.8); }
-        .form-check-label { font-size: 12px; color: var(--text-main); }
+    .btn-secondary {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border-color: var(--border-subtle);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
 
-        
-        .text-redacted {
-            opacity: 0.2;
-            user-select: none;
-            pointer-events: none;
-            text-decoration: line-through;
-        }
-        .meta-col {
-            background: rgba(0, 0, 0, 0.02) !important;
-        }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover {
+      color: var(--text-main);
+      background: rgba(255,255,255,0.05);
+    }
 
-        /* --- Data Table --- */
-        .nav-tabs .nav-link.active {
-            border-bottom: 2px solid var(--neon-cyan) !important;
-            color: var(--neon-cyan) !important;
-        }
-        .nav-tabs .nav-link:hover:not(.active) {
-            border-bottom: 2px solid rgba(0, 243, 255, 0.3) !important;
-            color: var(--text-main) !important;
-        }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-danger);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
 
-        .table-container {
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-        }
-        .table-glass {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-main);
-            background: transparent;
-        }
-        .table-glass thead th {
-            background: rgba(30, 41, 59, 0.9) !important; /* Sleek, professional dark slate */
-            color: #f8fafc !important;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            padding: 14px 16px;
-            border-bottom: 2px solid rgba(14, 165, 233, 0.4); /* Subtle cyan accent */
-            border-top: none;
-            white-space: nowrap;
-            text-shadow: none;
-            transition: all 0.3s ease;
-        }
-        .table-glass.data-fetched thead th {
-            background: rgba(14, 165, 233, 0.85) !important; /* Deep cyan to indicate active fetch */
-            color: #ffffff !important;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-        }
-        .table-glass tbody tr {
-            transition: all 0.2s ease;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .table-glass tbody td {
-            padding: 12px 16px;
-            vertical-align: middle;
-            white-space: nowrap;
-            background: transparent;
-            color: var(--text-main);
-            border-bottom: none;
-        }
-        .table-glass tbody tr:hover {
-            background: rgba(255,255,255,0.03);
-        }
-        
-        /* Table Dynamic Classes */
-        .col-hidden { display: none !important; }
-        .col-greyed {
-            opacity: 0.3;
-            pointer-events: none;
-            filter: grayscale(100%);
-        }
-        .row-highlight {
-            background: rgba(0, 243, 255, 0.05) !important;
-        }
-        .row-highlight td:first-child {
-            box-shadow: inset 3px 0 0 var(--neon-cyan);
-        }
+    .btn-sm {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.775rem;
+    }
 
-        /* Cell Styling Elements */
-        .badge-stage {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            background: rgba(255,255,255,0.8);
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-        .badge-awareness { color: var(--neon-cyan); border-color: rgba(0,243,255,0.3); }
-        .badge-consideration { color: var(--neon-amber); border-color: rgba(255,184,0,0.3); }
-        .badge-decision { color: var(--neon-green); border-color: rgba(0,255,136,0.3); }
-        .badge-interest { color: var(--neon-pink); border-color: rgba(255,0,234,0.3); }
-        
-        .badge-abm {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .badge-target { color: var(--neon-cyan); border: 1px solid rgba(0,243,255,0.4); background: rgba(0,243,255,0.05); }
-        .badge-notarget { color: var(--neon-pink); border: 1px solid rgba(255,0,234,0.4); background: rgba(255,0,234,0.05); }
+    /* Main Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
 
-        .pri-dot {
-            display: inline-block;
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 5px currentColor;
-        }
-        .pri-red { color: var(--neon-pink); background: var(--neon-pink); }
-        .pri-amber { color: var(--neon-amber); background: var(--neon-amber); }
-        .pri-blue { color: var(--neon-cyan); background: var(--neon-cyan); }
-        .pri-green { color: var(--neon-green); background: var(--neon-green); }
+    /* TAL Manager Off-Canvas Drawer Panel */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 340px;
+      max-width: 85vw;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      z-index: 250;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    }
 
-        .geo-badge {
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.2);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        .email-link {
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-        .email-link:hover { color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,243,255,0.5); }
-    </style>
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    /* Activity Log Right Drawer */
+    .activity-log-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 400px;
+      max-width: 90vw;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      z-index: 260;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
+    }
+    .activity-log-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .activity-count-pill {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+    }
+
+    .log-actions-bar {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .log-timeline-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .log-item {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+      transition: var(--transition);
+    }
+    .log-item:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .log-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .log-action-badge {
+      font-size: 0.675rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .log-badge-filter { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+    .log-badge-tal { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .log-badge-action { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .log-badge-reset { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .log-badge-view { background: rgba(6, 182, 212, 0.15); color: #38bdf8; }
+
+    .log-timestamp {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .log-description {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+
+    .log-details {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.2);
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      word-break: break-word;
+    }
+
+    .sidebar-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .sidebar-close-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--accent-danger);
+    }
+
+    .sidebar-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .add-tal-trigger {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .add-tal-trigger:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Inline Add TAL Form */
+    .inline-add-form {
+      padding: 1rem 1.25rem;
+      background: rgba(99, 102, 241, 0.05);
+      border-bottom: 1px solid var(--border-accent);
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+      animation: slideDown 0.2s ease-out;
+    }
+    .inline-add-form.active {
+      display: flex;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.55rem 0.85rem;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .sidebar-actions-panel {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    /* Drag & Drop Zone */
+    .upload-dropzone {
+      border: 2px dashed rgba(99, 102, 241, 0.3);
+      background: rgba(99, 102, 241, 0.03);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    .upload-dropzone i {
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+    .upload-dropzone span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .tal-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tal-item {
+      padding: 0.85rem 1rem;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .tal-item:hover {
+      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+    }
+    .tal-item.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .tal-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+      overflow: hidden;
+      padding-right: 0.5rem;
+    }
+
+    .tal-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.active {
+      background-color: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+    .status-dot.inactive {
+      background-color: var(--text-dim);
+    }
+
+    .tal-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tal-item.inactive-item .tal-name {
+      color: var(--text-muted);
+      text-decoration: line-through opacity(0.6);
+    }
+
+    .tal-meta {
+      font-size: 0.725rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* Menu Dropdown inside TAL Item */
+    .tal-menu-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .tal-menu-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-main);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      right: 0.5rem;
+      top: 2.4rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      z-index: 100;
+      min-width: 150px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .dropdown-menu.show {
+      display: flex;
+    }
+
+    .dropdown-item {
+      padding: 0.55rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .dropdown-item:hover {
+      background: var(--primary-light);
+      color: var(--text-main);
+    }
+    .dropdown-item.danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-danger);
+    }
+
+    /* Editing state inline */
+    .tal-edit-input {
+      background: var(--bg-base);
+      border: 1px solid var(--primary);
+      color: white;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: var(--radius-sm);
+      width: 100%;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg-base);
+      padding: 0.75rem 1rem;
+      gap: 0.65rem;
+    }
+
+    /* Stat Cards Bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: var(--transition);
+    }
+    .stat-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .stat-badge-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .stat-badge-icon.blue { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
+    .stat-badge-icon.green { background: rgba(16, 185, 129, 0.12); color: var(--accent-green); }
+    .stat-badge-icon.red { background: rgba(239, 68, 68, 0.12); color: var(--accent-danger); }
+
+    /* Cute & Compact Filters Section */
+    .filters-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .filters-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.6rem;
+    }
+
+    .filters-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filters-presets-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      min-height: 24px;
+    }
+
+    .preset-chip {
+      background: var(--primary-light);
+      border: 1px solid var(--border-accent);
+      color: var(--text-main);
+      font-size: 0.725rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .preset-chip:hover {
+      background: var(--primary);
+    }
+    .preset-chip i.delete-chip {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.6);
+    }
+    .preset-chip i.delete-chip:hover {
+      color: white;
+    }
+
+    /* Ultra-Compact & Cute Advanced Filters Card */
+    .compact-filters-card {
+      padding: 0.75rem 1rem;
+      gap: 0.6rem;
+    }
+
+    .compact-toggles-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      padding: 0.4rem 0.65rem;
+    }
+
+    .compact-row-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+      margin-right: 0.2rem;
+    }
+
+    .cute-toggle-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 0.2rem 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+    .cute-toggle-pill:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .cute-toggle-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .compact-input-label {
+      font-size: 0.725rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .input-field.super-compact-input,
+    .custom-select-trigger.super-compact-trigger {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.775rem;
+      border-radius: 8px;
+      height: 32px;
+    }
+
+    .abm-pills.super-compact-pills {
+      height: 32px;
+      border-radius: 8px;
+      padding: 2px;
+    }
+    .abm-pills.super-compact-pills .abm-pill {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    /* Cute Micro Toggle Switch */
+    .toggle-switch-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      padding: 2px;
+      display: inline-flex;
+      gap: 2px;
+      align-items: center;
+    }
+
+    .toggle-opt {
+      font-size: 0.65rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+
+    .toggle-opt:hover {
+      color: var(--text-main);
+    }
+
+    .toggle-opt.active[data-mode="include"] {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    }
+
+    .toggle-opt.active[data-mode="exclude"] {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
+    }
+
+    .input-field.compact-input {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: 10px;
+      height: 36px;
+    }
+
+    .custom-select-trigger.compact-trigger {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: 10px;
+      height: 36px;
+    }
+
+    .abm-pills.compact-pills {
+      height: 36px;
+      border-radius: 10px;
+      padding: 2px;
+    }
+
+    .abm-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.725rem;
+    }
+
+    /* Custom Dropdown for Buyer Research Stage */
+    .custom-select-container {
+      position: relative;
+    }
+
+    .custom-select-trigger {
+      width: 100%;
+      padding: 0.55rem 0.85rem;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .custom-select-dropdown {
+      position: absolute;
+      top: 105%;
+      left: 0;
+      right: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      z-index: 90;
+      padding: 0.5rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .custom-select-dropdown.show {
+      display: flex;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+    .checkbox-item:hover {
+      background: var(--primary-light);
+      color: var(--text-main);
+    }
+
+    /* Segmented ABM Pills */
+    .abm-pills {
+      display: flex;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.2rem;
+      gap: 0.2rem;
+    }
+    .abm-pill {
+      flex: 1;
+      text-align: center;
+      padding: 0.4rem;
+      font-size: 0.775rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .abm-pill.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Controls Action Bar */
+    .action-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 0.85rem;
+    }
+
+    .view-modes-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-view-mode {
+      opacity: 0.85;
+      cursor: pointer;
+      pointer-events: auto !important;
+      transition: var(--transition);
+    }
+    .btn-view-mode:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-view-mode.disabled-btn {
+      opacity: 0.45;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .btn-view-mode.active {
+      opacity: 1;
+      background: var(--primary) !important;
+      color: white !important;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Table Container */
+    .table-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      flex: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.8rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+    }
+
+    th.col-excluded {
+      border-bottom: 2px solid var(--accent-danger) !important;
+      color: var(--accent-danger);
+    }
+
+    td {
+      padding: 0.4rem 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Row Highlight in Filtered View */
+    tr.row-highlight-blue td {
+      background: var(--accent-blue-bg) !important;
+      border-bottom-color: var(--accent-blue-border);
+    }
+
+    /* Exclusion Greyed Cells */
+    td.col-greyed {
+      color: var(--text-dim) !important;
+      background: rgba(0, 0, 0, 0.25) !important;
+    }
+    td.col-greyed a {
+      pointer-events: none !important;
+      color: var(--text-dim) !important;
+      text-decoration: none !important;
+    }
+
+    .hidden-col {
+      display: none;
+    }
+    .revealed-col {
+      display: table-cell;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .badge-target { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-donottarget { background: rgba(239, 68, 68, 0.15); color: var(--accent-danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-neutral { background: rgba(156, 163, 175, 0.15); color: var(--text-muted); border: 1px solid rgba(156, 163, 175, 0.3); }
+
+    /* Table Pagination Footer */
+    .table-footer {
+      padding: 0.45rem 0.85rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pagination-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-base);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    /* Target Manager Button & Count Badge */
+    .badge-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+      font-size: 0.725rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      margin-left: 0.25rem;
+    }
+
+    /* Sidebar Drawer Backdrop Overlay */
+    .sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 240;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Responsive Breakpoints & Mobile Drawer */
+    @media (max-width: 1024px) {
+      .sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 250;
+        width: 320px !important;
+        min-width: 280px !important;
+        max-width: 85vw !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+      }
+
+      .sidebar.open {
+        transform: translateX(0) !important;
+      }
+
+      .sidebar-resizer {
+        display: none !important;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 0.75rem 1rem;
+      }
+
+      .brand {
+        gap: 0.5rem;
+      }
+
+      .main-content {
+        padding: 0.85rem;
+        gap: 1rem;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .view-modes-group {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .btn-view-mode {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .table-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .brand-title-text {
+        display: none;
+      }
+      .btn {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Modal Backdrop */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* Toast System */
+    .toast-container {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-accent);
+      color: var(--text-main);
+      padding: 0.85rem 1.1rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 280px;
+      pointer-events: auto;
+      animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .toast-icon {
+      color: var(--accent-green);
+      font-size: 1.1rem;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Top Navbar -->
-    <nav class="top-navbar glass-panel mx-3 mt-3">
-        <div class="d-flex align-items-center">
-            <div class="brand-logo me-4">Campaign <span style="color:#1e293b; font-weight:300;">Insights</span></div>
-        </div>
-        
-        <div class="d-none d-md-flex gap-3">
-            <div class="metric-chip">
-                <div class="filter-label mb-1">Total Leads</div>
-                <div class="metric-val val-total" id="metricTotal">0</div>
-            </div>
-            <div class="metric-chip">
-                <div class="filter-label mb-1">Target</div>
-                <div class="metric-val val-target" id="metricTarget">0</div>
-            </div>
-            <div class="metric-chip">
-                <div class="filter-label mb-1">Do Not Target</div>
-                <div class="metric-val val-notarget" id="metricNotTarget">0</div>
-            </div>
-        </div>
-
-        <div>
-            <button class="btn btn-glow btn-sm fw-bold rounded-pill px-3 py-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#talOffcanvas">
-                <i class="fa-solid fa-list-check me-2"></i> TAL Manager
-            </button>
-        </div>
-    </nav>
-
-    <!-- Main Container -->
-    <div class="container-fluid px-3 pb-4">
-        
-                <!-- Filter Bar -->
-        <div class="glass-panel p-3 mb-3" style="position: relative; z-index: 100;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-microchip me-2" style="color: var(--neon-cyan)"></i> TAL Config</h6>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-dark fw-semibold px-3 rounded-pill py-0 " style="height:20px; line-height:1; font-size: 12px;" id="saveFilterBtn">Save Filter</button>
-                    <button class="btn btn-sm btn-outline-dark fw-semibold px-3 rounded-pill py-0 " style="height:20px; line-height:1; font-size: 12px;" id="resetBtn">Reset All</button>
-                    <button class="btn btn-sm btn-glow fw-bold px-3 rounded-pill shadow-sm py-0" style="height:20px; line-height:1;font-size: 12px;" id="applyBtn">Fetch TAL</button>
-                </div>
-            </div>
-
-            <!-- Compact UI Layout -->
-            <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-                
-                <!-- Modes Group -->
-                <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="filter-label mb-0" style="font-size:10px;">Email</span>
-                        <div class="compact-toggle" style="width: 100px;">
-                            <input type="radio" name="emailMode" id="emInclude" value="Include">
-                            <label for="emInclude" style="font-size:9px;">Include</label>
-                            <input type="radio" name="emailMode" id="emExclude" value="Exclude" checked>
-                            <label for="emExclude" style="font-size:9px;">Exclude</label>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 w-">
-                        <span class="filter-label mb-0" style="font-size:10px;">Domain</span>
-                        <div class="compact-toggle" style="width: 100px;">
-                            <input type="radio" name="domainMode" id="domInclude" value="Include">
-                            <label for="domInclude" style="font-size:9px;">Include</label>
-                            <input type="radio" name="domainMode" id="domExclude" value="Exclude" checked>
-                            <label for="domExclude" style="font-size:9px;">Exclude</label>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="filter-label mb-0" style="font-size:10px;">Company</span>
-                        <div class="compact-toggle" style="width: 100px;">
-                            <input type="radio" name="companyMode" id="compInclude" value="Include">
-                            <label for="compInclude" style="font-size:9px;">Include</label>
-                            <input type="radio" name="companyMode" id="compExclude" value="Exclude" checked>
-                            <label for="compExclude" style="font-size:9px;">Exclude</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Geo & CPC Group -->
-                <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="filter-label mb-0" style="font-size:10px;">Geo</span>
-                        <select class="form-select form-control-glass px-2 py-0" style="height:22px; font-size:10px; width:auto;" id="geoMode">
-                            <option value="Include">In</option>
-                            <option value="Exclude" selected>Ex</option>
-                        </select>
-                        <input type="text" class="form-control form-control-glass px-2 py-0 shadow-none" style="height:22px; font-size:10px; width:90px;" id="geoInput" placeholder="US, CA...">
-                    </div>
-                    <div class="d-flex align-items-center gap-2 border-start border-light ps-3">
-                        <span class="filter-label mb-0" style="font-size:10px;">CPC</span>
-                        <select class="form-select form-control-glass px-2 py-0" style="height:22px; font-size:10px; width:auto;" id="cpcMode">
-                            <option value="Include">In</option>
-                            <option value="Exclude" selected>Ex</option>
-                        </select>
-                        <input type="number" class="form-control form-control-glass px-2 py-0 shadow-none" style="height:22px; font-size:10px; width:70px;" id="cpcInput" placeholder="Value">
-                    </div>
-                </div>
-
-                <!-- Priority & Status Group -->
-                <div class="glass-inner p-1 px-3 d-flex gap-3 align-items-center rounded-pill">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="filter-label mb-0" style="font-size:10px;">Priority</span>
-                        <input type="number" class="form-control form-control-glass px-1 py-0 shadow-none" style="height:22px; font-size:10px; width:45px; text-align:center" id="priMin" min="1" max="10" placeholder="Min">
-                        <span class="text-muted" style="font-size:10px;">-</span>
-                        <input type="number" class="form-control form-control-glass px-1 py-0 shadow-none" style="height:22px; font-size:10px; width:45px; text-align:center" id="priMax" min="1" max="10" placeholder="Max">
-                    </div>
-                    <div class="d-flex align-items-center gap-2 border-start border-light ps-3">
-                        <span class="filter-label mb-0" style="font-size:10px;">ABM</span>
-                        <div class="segmented-control p-0" style="height:22px; border:none; background:transparent;">
-                            <input type="radio" name="abmFilter" id="abmAll" value="All" checked>
-                            <label for="abmAll" class="bg-white rounded-pill" style="font-size:10px; padding: 2px 8px; margin:0; line-height:16px;width: 100px;">All</label>
-                            <input type="radio" name="abmFilter" id="abmTarget" value="Target">
-                            <label for="abmTarget" class="bg-white rounded-pill mx-1" style="font-size:10px; padding: 2px 8px; margin:0; line-height:16px; width: 100px;">Target</label>
-                            <input type="radio" name="abmFilter" id="abmNotTarget" value="DoNotTarget">
-                            <label for="abmNotTarget" class="bg-white rounded-pill" style="font-size:10px; padding: 2px 8px; margin:0; line-height:16px;width:100px;">Do Not Target</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stage Dropdown Group -->
-                <div class="glass-inner p-1 px-3 d-flex align-items-center rounded-pill">
-                    <span class="filter-label mb-0 me-2" style="font-size:10px;">Stage</span>
-                    <div class="dropdown">
-                        <button class="btn d-flex justify-content-between align-items-center form-control-glass px-2 py-0 shadow-none" style="height:22px; font-size:10px; width:180px; background: rgba(0,0,0,0.05);" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                            <span id="stageBtnText" class="text-truncate">All Stages</span>
-                            <i class="fa-solid fa-chevron-down ms-2 text-muted" style="font-size: 8px;"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-glass p-2 shadow" style="font-size: 11px;">
-                            <li><div class="form-check ms-2 mb-1"><input class="form-check-input stage-cb" type="checkbox" value="Awareness" id="stg1"><label class="form-check-label" for="stg1" style="cursor: pointer;">Awareness</label></div></li>
-                            <li><div class="form-check ms-2 mb-1"><input class="form-check-input stage-cb" type="checkbox" value="Consideration" id="stg2"><label class="form-check-label" for="stg2" style="cursor: pointer;">Consideration</label></div></li>
-                            <li><div class="form-check ms-2 mb-1"><input class="form-check-input stage-cb" type="checkbox" value="Decision" id="stg3"><label class="form-check-label" for="stg3" style="cursor: pointer;">Decision</label></div></li>
-                            <li><div class="form-check ms-2 mb-2"><input class="form-check-input stage-cb" type="checkbox" value="Interest" id="stg4"><label class="form-check-label" for="stg4" style="cursor: pointer;">Interest</label></div></li>
-                            <li><hr class="dropdown-divider border-secondary my-1"></li>
-                            <li><a class="dropdown-item text-danger text-center fw-bold rounded" href="#" id="clearStagesBtn" style="padding: 2px 0;">Clear</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-            </div>
-            
-            <!-- Saved Filters Chips -->
-            <div id="savedFiltersContainer" class="d-flex flex-wrap gap-2 mt-2 empty-d-none"></div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="glass-panel table-container">
-            <!-- New Tab Navigation -->
-            <div class="d-flex justify-content-between align-items-center px-3 pt-3" style="background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.05) !important;">
-                <ul class="nav nav-tabs border-0 mb-0" id="dataTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold" id="tab-complete" data-tab-value="Complete" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-main); font-size: 13px; padding-bottom: 12px;" disabled>View Complete TAL</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fw-bold" id="tab-filtered" data-tab-value="Filtered" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font-size: 13px; padding-bottom: 12px;" disabled>View Filtered TAL</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link fw-bold" id="tab-mapped" data-tab-value="Mapped" type="button" role="tab" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font-size: 13px; padding-bottom: 12px;" disabled>View Mapped TAL</button>
-                    </li>
-                </ul>
-                <div class="d-flex gap-2 pb-2">
-                    <button class="btn btn-sm btn-outline-secondary" id="exportLeadsBtn" style="font-size: 11px;"><i class="fa-solid fa-file-export me-1"></i> Export Leads</button>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-glass" id="leadsTable">
-                    <thead>
-                        <tr>
-                            <th id="th-email">Email</th>
-                            <th id="th-domain">Domain</th>
-                            <th id="th-company">Company Name</th>
-                            <th>Geo</th>
-                            <th>Domain CPC</th>
-                            <th>Research Stage</th>
-                            <th>Priority</th>
-                            <th>ABM Status</th>
-                            <th class="meta-col col-hidden border-start border-light">Standard Industry</th>
-                            <th class="meta-col col-hidden">Employee Size</th>
-                            <th class="meta-col col-hidden">HQ Country</th>
-                            <th class="meta-col col-hidden">LinkedIn</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Rows injected via JS -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination Footer -->
-            <div class="d-flex justify-content-between align-items-center p-3 border-top" style="border-color: rgba(0,0,0,0.05) !important;">
-                <div class="text-muted" style="font-size: 12px;" id="pageInfo">Showing 0 to 0 of 0 entries</div>
-                <div class="d-flex gap-1" id="paginationControls">
-                    <!-- Pagination injected via JS -->
-                </div>
-            </div>
-        </div>
+  <!-- Top Navigation Header -->
+  <header class="header">
+    <div class="brand">
+      <button class="btn btn-primary" id="btnToggleTalManager">
+        <i class="fa-solid fa-layer-group"></i> TAL Manager
+        <span class="badge-count" id="activeTalCountBadge">2</span>
+      </button>
+      <div class="brand-icon">
+        <i class="fa-solid fa-filter"></i>
+      </div>
+      <span class="brand-title-text">Target Account List Dashboard</span>
     </div>
-
-    <!-- Offcanvas Right (TAL Manager) -->
-    <div class="offcanvas offcanvas-end offcanvas-glass border-0" tabindex="-1" id="talOffcanvas" aria-labelledby="talOffcanvasLabel">
-        <div class="offcanvas-header border-bottom border-secondary">
-            <h5 class="offcanvas-title fw-bold" id="talOffcanvasLabel"><i class="fa-solid fa-list-check me-2" style="color: var(--neon-cyan)"></i> TAL Lists</h5>
-            <button type="button" class="btn-close " data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body d-flex flex-column gap-4">
-            
-            <!-- Sidebar Engine Toggles -->
-            <div class="glass-inner p-3 d-flex flex-column gap-3 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="filter-label mb-0" style="font-size:10px;">TAL / ABM</span>
-                    <div class="compact-toggle" style="width: 140px;">
-                        <input type="radio" name="sideTalAbm" id="sideAbmYes" value="Yes" checked>
-                        <label for="sideAbmYes" style="font-size:10px;">Enabled</label>
-                        <input type="radio" name="sideTalAbm" id="sideAbmNo" value="No">
-                        <label for="sideAbmNo" style="font-size:10px;">Bypass</label>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="filter-label mb-0" style="font-size:10px;">TAL / ABM Status</span>
-                    <div class="compact-toggle" style="width: 140px;">
-                        <input type="radio" name="sideTalStatus" id="sideStatActive" value="Active" checked>
-                        <label for="sideStatActive" style="font-size:10px;">Live</label>
-                        <input type="radio" name="sideTalStatus" id="sideStatInactive" value="Inactive">
-                        <label for="sideStatInactive" style="font-size:10px;">Dormant</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- List Manager -->
-            <div class="d-flex flex-column flex-grow-1 min-h-0">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0 fw-bold text-dark">TAL Lists</h6>
-                    <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width:26px; height:26px; background: var(--neon-cyan); color: #fff; border: none;" id="addTalBtn" title="Add List"><i class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
-                </div>
-                
-                <button class="btn btn-glow btn-sm border-dashed mb-2 w-100 text-start rounded-3" id="uploadTalBtn">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload TAL (.csv)
-                </button>
-                <input type="file" id="csvFileInput" accept=".csv" class="d-none">
-                
-                <button class="btn btn-outline-secondary btn-sm mb-3 w-100 text-start rounded-3" id="downloadSampleBtn">
-                    <i class="fa-solid fa-download me-2"></i> Download Sample File
-                </button>
-                
-                                <div id="addTalForm" class="d-none mb-3 p-3 glass-inner shadow-sm rounded-3">
-                    <label class="form-label small fw-bold {text_color} mb-2"><i class="fa-solid fa-folder-plus me-1 text-primary"></i> Create New List</label>
-                    <div class="input-group input-group-sm mb-2">
-                        <input type="text" class="form-control form-control-glass" id="newTalNameInput" placeholder="Enter list name...">
-                    </div>
-                    <div class="d-flex justify-content-end gap-2 mt-2">
-                        <button class="btn btn-sm {btn_outline} py-1" id="cancelTalBtn" type="button" style="font-size:11px"><i class="fa-solid fa-xmark me-1"></i> Cancel</button>
-                        <button class="btn btn-sm btn-glow py-1 px-3 fw-bold" id="saveTalBtn" type="button" style="font-size:11px"><i class="fa-solid fa-check me-1"></i> Save</button>
-                    </div>
-                </div>
-
-                <div class="tal-list-container flex-grow-1 overflow-y-auto pe-1" id="talListContainer">
-                    <!-- Dynamic TAL items -->
-                </div>
-            </div>
-
-            <div class="mt-auto text-muted small text-center">
-                <i class="fa-solid fa-satellite-dish mb-2 fs-5"></i><br>
-                Deploy modules to restrict visible data nodes.
-            </div>
-        </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btnToggleActivityLog" title="View Activity History Log">
+        <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-cyan);"></i> Activity Log
+        <span class="badge-count" id="activityLogCountBadge" style="background: rgba(6, 182, 212, 0.25); color: #38bdf8;">0</span>
+      </button>
+      <button class="btn btn-secondary" id="btnExportLeads">
+        <i class="fa-solid fa-file-export"></i> Export Leads
+      </button>
     </div>
+  </header>
 
-    <!-- Bootstrap Toasts -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1070;">
-        <div id="appToast" class="toast align-items-center glass-panel border-0 text-dark" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body fw-medium" id="appToastMessage"></div>
-                <button type="button" class="btn-close  me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
+  <!-- Application Main Body -->
+  <div class="app-container">
+
+    <!-- Sidebar Backdrop Overlays -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="sidebar-backdrop" id="logBackdrop"></div>
+
+    <!-- Activity Log Off-Canvas Drawer (Right Side) -->
+    <aside class="activity-log-drawer" id="activityLogDrawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-cyan);"></i> <span>Activity History Log</span>
+          <span class="activity-count-pill" id="logTotalCount">0 Actions</span>
         </div>
+        <div class="sidebar-close-btn" id="btnCloseLogDrawer" title="Close Activity Log">
+          <i class="fa-solid fa-xmark"></i>
+        </div>
+      </div>
+
+      <!-- Log Actions Bar -->
+      <div class="log-actions-bar">
+        <input type="text" id="inputSearchLogs" class="input-field super-compact-input" placeholder="Search activity logs...">
+        <button class="btn btn-ghost btn-sm" id="btnClearLog" title="Clear Log History">
+          <i class="fa-solid fa-trash-can"></i> Clear
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnExportLog" title="Export Log as JSON">
+          <i class="fa-solid fa-download"></i> Export Log
+        </button>
+      </div>
+
+      <!-- Log Timeline Container -->
+      <div class="log-timeline-container" id="logTimelineContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </aside>
+
+    <!-- Sidebar: TAL Manager Drawer Panel -->
+    <aside class="sidebar" id="mainSidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-list-check"></i> <span>TAL Manager</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <div class="add-tal-trigger" id="btnToggleAddForm" title="Add New TAL">
+            <i class="fa-solid fa-plus"></i>
+          </div>
+          <div class="sidebar-close-btn" id="btnCloseSidebar" title="Close TAL Manager">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inline Add TAL Form -->
+      <div class="inline-add-form" id="inlineAddForm">
+        <input type="text" id="inputNewTalName" class="input-field" placeholder="Enter list name...">
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+          <button class="btn btn-ghost btn-sm" id="btnCancelAdd">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="btnSaveNewTal">Add List</button>
+        </div>
+      </div>
+
+      <!-- File Actions Panel: CSV Upload & Download Sample -->
+      <div class="sidebar-actions-panel">
+        <div class="upload-dropzone" id="uploadDropzone">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span><strong>Upload TAL (.csv)</strong> or Drag & Drop</span>
+          <input type="file" id="fileCsvInput" accept=".csv" style="display: none;">
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btnDownloadSample" style="width: 100%; justify-content: center;">
+          <i class="fa-solid fa-download"></i> Download Sample CSV
+        </button>
+      </div>
+
+      <!-- TAL Items Container -->
+      <div class="tal-list-container" id="talListContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+
+      <!-- Metrics Cards Row -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Total Leads</span>
+            <span class="stat-value" id="statTotalLeads">0</span>
+          </div>
+          <div class="stat-badge-icon blue">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Target Leads</span>
+            <span class="stat-value" id="statTargetLeads">0</span>
+          </div>
+          <div class="stat-badge-icon green">
+            <i class="fa-solid fa-bullseye"></i>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Do Not Target</span>
+            <span class="stat-value" id="statDoNotTargetLeads">0</span>
+          </div>
+          <div class="stat-badge-icon red">
+            <i class="fa-solid fa-ban"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Filtering Controls Panel (Ultra-Compact & Cute) -->
+      <div class="filters-card compact-filters-card">
+        <div class="filters-header">
+          <div class="filters-title">
+            <i class="fa-solid fa-sliders"></i> <span>Advanced Filter Controls</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btnOpenSavePresetModal">
+            <i class="fa-solid fa-bookmark"></i> Save Filter
+          </button>
+        </div>
+
+        <!-- Saved Filter Chips Bar -->
+        <div class="filters-presets-bar" id="presetsBar">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Row 1: Cute Micro Toggle Switches -->
+        <div class="compact-toggles-row">
+          <span class="compact-row-tag"><i class="fa-solid fa-eye-slash"></i> Field Toggles:</span>
+          
+          <div class="cute-toggle-pill">
+            <span class="cute-toggle-label"><i class="fa-regular fa-envelope" style="color: var(--primary);"></i> Email</span>
+            <div class="toggle-switch-btn" data-field="email">
+              <span class="toggle-opt" data-mode="include">Include</span>
+              <span class="toggle-opt active exclude-mode" data-mode="exclude">Exclude</span>
+            </div>
+          </div>
+
+          <div class="cute-toggle-pill">
+            <span class="cute-toggle-label"><i class="fa-solid fa-globe" style="color: var(--accent-cyan);"></i> Domain</span>
+            <div class="toggle-switch-btn" data-field="domain">
+              <span class="toggle-opt" data-mode="include">Include</span>
+              <span class="toggle-opt active exclude-mode" data-mode="exclude">Exclude</span>
+            </div>
+          </div>
+
+          <div class="cute-toggle-pill">
+            <span class="cute-toggle-label"><i class="fa-regular fa-building" style="color: var(--accent-green);"></i> Company Name</span>
+            <div class="toggle-switch-btn" data-field="company">
+              <span class="toggle-opt" data-mode="include">Include</span>
+              <span class="toggle-opt active exclude-mode" data-mode="exclude">Exclude</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Compact Filter Attributes Grid -->
+        <div class="filters-grid compact-grid">
+          <!-- Geo Country -->
+          <div class="filter-group">
+            <label class="compact-input-label"><i class="fa-solid fa-location-dot" style="color: var(--accent-warning);"></i> Geo Country</label>
+            <input type="text" class="input-field super-compact-input" id="filterGeo" placeholder="e.g. US, CA...">
+          </div>
+
+          <!-- Priority Range -->
+          <div class="filter-group">
+            <label class="compact-input-label"><i class="fa-solid fa-arrow-up-1-9" style="color: #a855f7;"></i> Priority (1-10)</label>
+            <div style="display: flex; gap: 0.25rem;">
+              <input type="number" min="1" max="10" class="input-field super-compact-input" id="filterPriorityMin" placeholder="Min">
+              <input type="number" min="1" max="10" class="input-field super-compact-input" id="filterPriorityMax" placeholder="Max">
+            </div>
+          </div>
+
+          <!-- Domain CPC -->
+          <div class="filter-group">
+            <label class="compact-input-label"><i class="fa-solid fa-dollar-sign" style="color: #ec4899;"></i> Domain CPC</label>
+            <input type="text" class="input-field super-compact-input" id="filterCpc" placeholder="e.g. 5.00, 12.50...">
+          </div>
+
+          <!-- Buyer Research Stage -->
+          <div class="filter-group">
+            <label class="compact-input-label"><i class="fa-solid fa-chart-pie" style="color: #3b82f6;"></i> Research Stage</label>
+            <div class="custom-select-container">
+              <div class="custom-select-trigger super-compact-trigger" id="stageSelectTrigger">
+                <span id="stageSelectText">Select Stages...</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+              <div class="custom-select-dropdown" id="stageSelectDropdown">
+                <label class="checkbox-item"><input type="checkbox" value="Awareness" class="stage-cb"> Awareness</label>
+                <label class="checkbox-item"><input type="checkbox" value="Consideration" class="stage-cb"> Consideration</label>
+                <label class="checkbox-item"><input type="checkbox" value="Decision" class="stage-cb"> Decision</label>
+                <label class="checkbox-item"><input type="checkbox" value="Interest" class="stage-cb"> Interest</label>
+                <button class="btn btn-ghost btn-sm" id="btnClearStageSelection" style="margin-top: 0.2rem; width: 100%; justify-content: center;">Clear Selection</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABM Status -->
+          <div class="filter-group">
+            <label class="compact-input-label"><i class="fa-solid fa-bullseye" style="color: #10b981;"></i> ABM Status</label>
+            <div class="abm-pills super-compact-pills" id="abmPills">
+              <div class="abm-pill active" data-abm="All">All</div>
+              <div class="abm-pill" data-abm="Target">Target</div>
+              <div class="abm-pill" data-abm="DoNotTarget">Do Not Target</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Controls & View Modes Bar -->
+      <div class="action-controls-bar">
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-primary" id="btnFetchTal">
+            <i class="fa-solid fa-bolt"></i> Fetch TAL (Apply Filters)
+          </button>
+          <button class="btn btn-secondary" id="btnResetAll">
+            <i class="fa-solid fa-rotate-left"></i> Reset All
+          </button>
+        </div>
+
+        <div class="view-modes-group">
+          <button class="btn btn-secondary btn-view-mode" id="btnViewComplete" data-view="complete">
+            View Complete TAL
+          </button>
+          <button class="btn btn-secondary btn-view-mode" id="btnViewFiltered" data-view="filtered">
+            View Filtered TAL
+          </button>
+          <button class="btn btn-secondary btn-view-mode" id="btnViewMapped" data-view="mapped">
+            View Mapped TAL
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Leads Table Container -->
+      <div class="table-container">
+        <div class="table-wrapper">
+          <table id="leadsTable">
+            <thead>
+              <tr>
+                <th>Lead ID</th>
+                <th>Name</th>
+                <th id="th-email">Email</th>
+                <th id="th-domain">Domain</th>
+                <th id="th-company">Company Name</th>
+                <th>Geo Country</th>
+                <th>Priority</th>
+                <th>Domain CPC</th>
+                <th>Research Stage</th>
+                <th>ABM Status</th>
+                <th class="hidden-col col-revealed-detail">Standard Industry</th>
+                <th class="hidden-col col-revealed-detail">Employee Size</th>
+                <th class="hidden-col col-revealed-detail">HQ Country</th>
+                <th class="hidden-col col-revealed-detail">LinkedIn</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Footer -->
+        <div class="table-footer">
+          <div class="pagination-info" id="paginationInfo">
+            Showing 0 to 0 of 0 leads
+          </div>
+          <div class="pagination-controls" id="paginationControls">
+            <!-- Dynamic page numbers -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Save Preset Modal -->
+  <div class="modal-overlay" id="savePresetModal">
+    <div class="modal-box">
+      <div class="modal-title"><i class="fa-solid fa-bookmark"></i> Save Filter Preset</div>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Enter a unique name to save your current filter settings for quick access.</p>
+      <input type="text" class="input-field" id="inputPresetName" placeholder="Preset name (e.g. US Tech High Priority)">
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+        <button class="btn btn-ghost" id="btnCancelPreset">Cancel</button>
+        <button class="btn btn-primary" id="btnConfirmSavePreset">Save Preset</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Application Logic -->
-    <script>
-        // --- 1. Mock Data Schema ---
-        const dummyLeads = [
-            { email: "ralph@nhassociates.com", domain: "nhassociates.com", company: "Neil Hoosier & Associates", geo: "US", cpc: 5, stage: "Awareness", priority: 1, abm: "Target", industry: "Government", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "krystal@rdsi.com", domain: "rdsi.com", company: "Research & Design", geo: "US", cpc: 5, stage: "Consideration", priority: 2, abm: "Target", industry: "Manufacturing", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "margaret@national.ball", domain: "national.ball", company: "The National Ball", geo: "CA", cpc: 5, stage: "Decision", priority: 3, abm: "DoNotTarget", industry: "Media & Ent.", size: "51 to 200", hq: "Canada", linkedin: "https://linkedin.com/..." },
-            { email: "sam@hunterhealth.com", domain: "hunterhealth.com", company: "Hunter Health", geo: "US", cpc: 4, stage: "Interest", priority: 2, abm: "Target", industry: "Healthcare", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "harnanda@mativ.com", domain: "mativ.com", company: "Mativ", geo: "US", cpc: 4, stage: "—", priority: 3, abm: "DoNotTarget", industry: "Manufacturing", size: "5k to 10k", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "tricia@hiya.com", domain: "hiya.com", company: "Hiya Inc.", geo: "US", cpc: 4, stage: "Awareness", priority: 1, abm: "Target", industry: "Computer", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "artursb@ofbf.org", domain: "ofbf.org", company: "Ohio Farm B", geo: "US", cpc: 3, stage: "Consideration", priority: 2, abm: "Target", industry: "Non-Profit", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "jacob@pricebenowi.com", domain: "pricebenowi.com", company: "Price Benow", geo: "US", cpc: 3, stage: "Decision", priority: 3, abm: "DoNotTarget", industry: "Legal", size: "11 to 50", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "anthony@groupon.com", domain: "groupon.com", company: "Groupon, Inc", geo: "US", cpc: 3, stage: "Interest", priority: 2, abm: "Target", industry: "Marketing", size: "1k to 5k", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "dmitry@hudsonville.com", domain: "hudsonville.com", company: "Hudsonville", geo: "US", cpc: 3, stage: "—", priority: 3, abm: "DoNotTarget", industry: "Food & Bev", size: "51 to 200", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "sarah@techcorp.uk", domain: "techcorp.uk", company: "TechCorp UK", geo: "UK", cpc: 8, stage: "Decision", priority: 9, abm: "Target", industry: "Software", size: "201 to 500", hq: "United Kingdom", linkedin: "https://linkedin.com/..." },
-            { email: "james@auslogistics.com", domain: "auslogistics.com", company: "Aus Logistics", geo: "AU", cpc: 6, stage: "Interest", priority: 7, abm: "Target", industry: "Logistics", size: "501 to 1k", hq: "Australia", linkedin: "https://linkedin.com/..." },
-            { email: "clara@berlinauto.de", domain: "berlinauto.de", company: "Berlin Automotive", geo: "DE", cpc: 7, stage: "Awareness", priority: 5, abm: "DoNotTarget", industry: "Automotive", size: "10k+", hq: "Germany", linkedin: "https://linkedin.com/..." },
-            { email: "jean@parisretail.fr", domain: "parisretail.fr", company: "Paris Retail Group", geo: "FR", cpc: 2, stage: "Consideration", priority: 4, abm: "Target", industry: "Retail", size: "51 to 200", hq: "France", linkedin: "https://linkedin.com/..." },
-            { email: "kenji@tokyofinance.jp", domain: "tokyofinance.jp", company: "Tokyo Finance", geo: "JP", cpc: 10, stage: "Decision", priority: 10, abm: "Target", industry: "Finance", size: "1k to 5k", hq: "Japan", linkedin: "https://linkedin.com/..." },
-            { email: "arun@indiatech.in", domain: "indiatech.in", company: "India Tech Solutions", geo: "IN", cpc: 1, stage: "Interest", priority: 6, abm: "Target", industry: "IT Services", size: "201 to 500", hq: "India", linkedin: "https://linkedin.com/..." },
-            { email: "mia@globalhealth.com", domain: "globalhealth.com", company: "Global Health", geo: "US", cpc: 9, stage: "Consideration", priority: 8, abm: "Target", industry: "Healthcare", size: "5k to 10k", hq: "United States", linkedin: "https://linkedin.com/..." },
-            { email: "lucas@brazilagri.br", domain: "brazilagri.br", company: "Brazil Agriculture", geo: "BR", cpc: 4, stage: "Awareness", priority: 5, abm: "DoNotTarget", industry: "Agriculture", size: "501 to 1k", hq: "Brazil", linkedin: "https://linkedin.com/..." },
-            { email: "olivia@canadamining.ca", domain: "canadamining.ca", company: "Canada Mining Corp", geo: "CA", cpc: 7, stage: "Decision", priority: 9, abm: "Target", industry: "Mining", size: "10k+", hq: "Canada", linkedin: "https://linkedin.com/..." },
-            { email: "liam@dublintech.ie", domain: "dublintech.ie", company: "Dublin Tech", geo: "IE", cpc: 6, stage: "—", priority: 4, abm: "DoNotTarget", industry: "Software", size: "11 to 50", hq: "Ireland", linkedin: "https://linkedin.com/..." }
-        ];
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
-        let talLists = [
-            {
-                id: "tal-1",
-                name: "TAL 1",
-                active: true,
-                leads: ["nhassociates.com", "rdsi.com", "hiya.com"],
-                savedFilters: null
-            },
-            {
-                id: "tal-2",
-                name: "TAL 2",
-                active: false,
-                leads: ["groupon.com", "mativ.com", "hunterhealth.com"],
-                savedFilters: null
-            },
-            {
-                id: "tal-3",
-                name: "TAL 3",
-                active: true,
-                leads: ["techcorp.uk", "auslogistics.com", "berlinauto.de", "parisretail.fr", "tokyofinance.jp", "indiatech.in", "globalhealth.com", "brazilagri.br", "canadamining.ca", "dublintech.ie"],
-                savedFilters: null
-            }
-        ];
+  <!-- Main JavaScript Logic -->
+  <script>
+    // ==========================================
+    // DATA STATE & CORE STRUCTURES
+    // ==========================================
+    const DEFAULT_TALS = [
+      {
+        id: 'tal-1',
+        name: 'TAL 1 (Tech Enterprise)',
+        active: true,
+        selected: true,
+        createdAt: '2026-07-20 09:30',
+        allowDelete: true,
+        leads: []
+      },
+      {
+        id: 'tal-2',
+        name: 'TAL 2 (US High Priority)',
+        active: true,
+        selected: true,
+        createdAt: '2026-07-21 14:15',
+        allowDelete: true,
+        leads: []
+      },
+      {
+        id: 'tal-3',
+        name: 'TAL 3 (Healthcare Focus)',
+        active: false,
+        selected: false,
+        createdAt: '2026-07-22 11:00',
+        allowDelete: true,
+        leads: []
+      }
+    ];
 
-        // --- State ---
-        let currentTab = 'Complete';
-        let filtersApplied = false; 
-        let currentPage = 1;
-        const rowsPerPage = 10;
-        let visibleLeadsCache = [];
-        let savedGlobalFilters = [];
+    const SAMPLE_COMPANIES = ['Acme Corp', 'Apex Systems', 'Nexus Cloud', 'Starlight Tech', 'BioGenix', 'Horizon Global', 'Quantum AI', 'CyberPulse', 'Vanguard Data', 'OmniHealth'];
+    const SAMPLE_DOMAINS = ['acme.com', 'apexsys.io', 'nexuscloud.net', 'starlighttech.com', 'biogenix.org', 'horizonglobal.com', 'quantumai.co', 'cyberpulse.io', 'vanguard.com', 'omnihealth.org'];
+    const SAMPLE_FIRST_NAMES = ['Sarah', 'Michael', 'Emily', 'David', 'Jessica', 'James', 'Amanda', 'Robert', 'Sophia', 'Daniel'];
+    const SAMPLE_LAST_NAMES = ['Chen', 'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Garcia', 'Rodriguez'];
+    const SAMPLE_GEOS = ['US', 'CA', 'UK', 'DE', 'FR', 'AU', 'JP', 'IN', 'SG', 'BR'];
+    const SAMPLE_STAGES = ['Awareness', 'Consideration', 'Decision', 'Interest'];
+    const SAMPLE_INDUSTRIES = ['Enterprise Software', 'Healthcare IT', 'Cybersecurity', 'Financial Technology', 'Biotechnology', 'E-Commerce Logistics'];
+    const SAMPLE_SIZES = ['50-200', '201-500', '501-1000', '1000-5000', '5000+'];
+
+    // Load activity log history from localStorage
+    function loadActivityLogs() {
+      try {
+        const saved = localStorage.getItem('tal_activity_logs');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    let state = {
+      tals: DEFAULT_TALS,
+      viewMode: 'complete', // 'complete', 'filtered', 'mapped'
+      filtersApplied: false,
+      currentPage: 1,
+      pageSize: 10,
+      savedPresets: [],
+      activityLogs: loadActivityLogs(),
+      fieldModes: {
+        email: 'exclude',
+        domain: 'exclude',
+        company: 'exclude',
+        geo: 'include',
+        cpc: 'include'
+      },
+      activeAbm: 'All'
+    };
+
+    function saveActivityLogs() {
+      try {
+        localStorage.setItem('tal_activity_logs', JSON.stringify(state.activityLogs));
+      } catch (e) {}
+    }
+
+    function logActivity(actionTitle, details = '', type = 'action', icon = 'fa-info-circle') {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const dateStr = now.toLocaleDateString();
+
+      const logItem = {
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        title: actionTitle,
+        details: details,
+        type: type, // 'filter', 'tal', 'action', 'reset', 'view'
+        icon: icon,
+        timestamp: `${dateStr} ${timeStr}`,
+        rawTime: now.getTime()
+      };
+
+      state.activityLogs.unshift(logItem);
+      if (state.activityLogs.length > 200) {
+        state.activityLogs = state.activityLogs.slice(0, 200);
+      }
+
+      saveActivityLogs();
+      updateLogBadgeCount();
+
+      const drawer = document.getElementById('activityLogDrawer');
+      if (drawer && drawer.classList.contains('open')) {
+        renderLogTimeline();
+      }
+    }
+
+    function updateLogBadgeCount() {
+      const badge = document.getElementById('activityLogCountBadge');
+      const totalCount = document.getElementById('logTotalCount');
+      if (badge) badge.textContent = state.activityLogs.length;
+      if (totalCount) totalCount.textContent = `${state.activityLogs.length} Actions`;
+    }
+
+    function renderLogTimeline() {
+      const container = document.getElementById('logTimelineContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const searchInput = document.getElementById('inputSearchLogs');
+      const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+      const filteredLogs = state.activityLogs.filter(log => {
+        if (!query) return true;
+        return log.title.toLowerCase().includes(query) || log.details.toLowerCase().includes(query) || log.type.toLowerCase().includes(query);
+      });
+
+      if (filteredLogs.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <i class="fa-solid fa-clock-rotate-left" style="font-size: 2rem; opacity: 0.3; margin-bottom: 0.5rem; display: block;"></i>
+            No activity history recorded yet.
+          </div>
+        `;
+        return;
+      }
+
+      filteredLogs.forEach(log => {
+        const item = document.createElement('div');
+        item.className = 'log-item';
+
+        let badgeClass = 'log-badge-action';
+        if (log.type === 'filter') badgeClass = 'log-badge-filter';
+        if (log.type === 'tal') badgeClass = 'log-badge-tal';
+        if (log.type === 'reset') badgeClass = 'log-badge-reset';
+        if (log.type === 'view') badgeClass = 'log-badge-view';
+
+        item.innerHTML = `
+          <div class="log-item-header">
+            <span class="log-action-badge ${badgeClass}"><i class="fa-solid ${log.icon}"></i> ${log.type.toUpperCase()}</span>
+            <span class="log-timestamp"><i class="fa-regular fa-clock"></i> ${log.timestamp}</span>
+          </div>
+          <div class="log-description">${escapeHtml(log.title)}</div>
+          ${log.details ? `<div class="log-details">${escapeHtml(log.details)}</div>` : ''}
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // Helper: Seed initial mock data for default TALs
+    function generateMockLeads(count, prefixName) {
+      const leads = [];
+      for (let i = 1; i <= count; i++) {
+        const fn = SAMPLE_FIRST_NAMES[Math.floor(Math.random() * SAMPLE_FIRST_NAMES.length)];
+        const ln = SAMPLE_LAST_NAMES[Math.floor(Math.random() * SAMPLE_LAST_NAMES.length)];
+        const domainIdx = Math.floor(Math.random() * SAMPLE_DOMAINS.length);
+        const domain = SAMPLE_DOMAINS[domainIdx];
+        const company = SAMPLE_COMPANIES[domainIdx];
+        const email = `${fn.toLowerCase()}.${ln.toLowerCase()}@${domain}`;
+        const geo = SAMPLE_GEOS[Math.floor(Math.random() * SAMPLE_GEOS.length)];
+        const priority = Math.floor(Math.random() * 10) + 1;
+        const cpc = (Math.random() * 15 + 1).toFixed(2);
+        const stage = SAMPLE_STAGES[Math.floor(Math.random() * SAMPLE_STAGES.length)];
+        const abmRand = Math.random();
+        const abm = abmRand > 0.6 ? 'Target' : (abmRand > 0.3 ? 'DoNotTarget' : 'Neutral');
+
+        leads.push({
+          id: `LD-${Math.floor(10000 + Math.random() * 90000)}`,
+          name: `${fn} ${ln}`,
+          email: email,
+          domain: domain,
+          company: company,
+          geo: geo,
+          priority: priority,
+          cpc: parseFloat(cpc),
+          stage: stage,
+          abm: abm,
+          // Revealed Details
+          industry: SAMPLE_INDUSTRIES[Math.floor(Math.random() * SAMPLE_INDUSTRIES.length)],
+          empSize: SAMPLE_SIZES[Math.floor(Math.random() * SAMPLE_SIZES.length)],
+          hqCountry: geo,
+          linkedin: `https://linkedin.com/in/${fn.toLowerCase()}-${ln.toLowerCase()}`
+        });
+      }
+      return leads;
+    }
+
+    // Initialize mock leads
+    state.tals.forEach(tal => {
+      tal.leads = generateMockLeads(10, tal.name);
+    });
+
+    // ==========================================
+    // UI TOAST NOTIFICATIONS
+    // ==========================================
+    function showToast(message, icon = 'fa-check-circle') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <i class="fa-solid ${icon} toast-icon"></i>
+        <span style="font-size: 0.85rem; font-weight: 500;">${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(50px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // ==========================================
+    // RENDER FUNCTIONS
+    // ==========================================
+
+    // Render Sidebar TAL List
+    function renderSidebar() {
+      const container = document.getElementById('talListContainer');
+      container.innerHTML = '';
+
+      // Update Target Manager Header Badge
+      const activeCount = state.tals.filter(t => t.active && t.selected).length;
+      const badge = document.getElementById('activeTalCountBadge');
+      if (badge) badge.textContent = activeCount;
+
+      state.tals.forEach((tal, index) => {
+        const item = document.createElement('div');
+        item.className = `tal-item ${tal.selected ? 'selected' : ''} ${!tal.active ? 'inactive-item' : ''}`;
         
-        // --- 2. DOM Elements ---
-        const els = {
-            tableBody: document.getElementById('tableBody'),
-            talContainer: document.getElementById('talListContainer'),
-            addTalBtn: document.getElementById('addTalBtn'),
-            uploadTalBtn: document.getElementById('uploadTalBtn'),
-            csvFileInput: document.getElementById('csvFileInput'),
-            downloadSampleBtn: document.getElementById('downloadSampleBtn'),
-            exportLeadsBtn: document.getElementById('exportLeadsBtn'),
-            saveFilterBtn: document.getElementById('saveFilterBtn'),
-            savedFiltersContainer: document.getElementById('savedFiltersContainer'),
-            paginationControls: document.getElementById('paginationControls'),
-            pageInfo: document.getElementById('pageInfo'),
-            addTalForm: document.getElementById('addTalForm'),
-            cancelTalBtn: document.getElementById('cancelTalBtn'),
-            saveTalBtn: document.getElementById('saveTalBtn'),
-            newTalNameInput: document.getElementById('newTalNameInput'),
-            
-            // Sidebar Inputs
-            sideTalAbm: document.getElementsByName('sideTalAbm'),
-            sideTalStatus: document.getElementsByName('sideTalStatus'),
-            
-            // Dashboard Inputs
-            emailMode: document.getElementsByName('emailMode'),
-            domainMode: document.getElementsByName('domainMode'),
-            companyMode: document.getElementsByName('companyMode'),
-            geoMode: document.getElementById('geoMode'),
-            geoInput: document.getElementById('geoInput'),
-            priMin: document.getElementById('priMin'),
-            priMax: document.getElementById('priMax'),
-            cpcMode: document.getElementById('cpcMode'),
-            cpcInput: document.getElementById('cpcInput'),
-            stageCbs: document.querySelectorAll('.stage-cb'),
-            stageBtnText: document.getElementById('stageBtnText'),
-            clearStagesBtn: document.getElementById('clearStagesBtn'),
-            abmFilter: document.getElementsByName('abmFilter'),
-            
-            // Buttons
-            resetBtn: document.getElementById('resetBtn'),
-            applyBtn: document.getElementById('applyBtn'),
+        item.innerHTML = `
+          <div class="tal-info" onclick="toggleTalSelection('${tal.id}')">
+            <div class="tal-title-row">
+              <span class="status-dot ${tal.active ? 'active' : 'inactive'}"></span>
+              <span class="tal-name" id="name-${tal.id}">${escapeHtml(tal.name)}</span>
+            </div>
+            <div class="tal-meta">
+              <span><i class="fa-solid fa-users"></i> ${tal.leads.length} leads</span>
+              <span><i class="fa-regular fa-clock"></i> ${tal.createdAt.split(' ')[0]}</span>
+            </div>
+          </div>
+          <div class="tal-menu-btn" onclick="toggleDropdownMenu(event, '${tal.id}')">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </div>
+          <div class="dropdown-menu" id="menu-${tal.id}">
+            <div class="dropdown-item" onclick="toggleTalActiveStatus(event, '${tal.id}')">
+              <i class="fa-solid ${tal.active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i> ${tal.active ? 'Deactivate' : 'Activate'}
+            </div>
+            <div class="dropdown-item" onclick="cloneTal(event, '${tal.id}')">
+              <i class="fa-solid fa-copy"></i> Clone
+            </div>
+            <div class="dropdown-item" onclick="enableTalEdit(event, '${tal.id}')">
+              <i class="fa-solid fa-pen"></i> Edit Name
+            </div>
+            ${tal.allowDelete ? `
+              <div class="dropdown-item danger" onclick="deleteTal(event, '${tal.id}')">
+                <i class="fa-solid fa-trash-can"></i> Delete
+              </div>
+            ` : `
+              <div class="dropdown-item disabled-item" title="This TAL is modified or in-use and cannot be deleted." style="opacity: 0.45; cursor: not-allowed;" onclick="deleteTal(event, '${tal.id}')">
+                <i class="fa-solid fa-lock" style="color: var(--text-dim);"></i> Delete (Locked)
+              </div>
+            `}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
 
-            // Metrics
-            mTotal: document.getElementById('metricTotal'),
-            mTarget: document.getElementById('metricTarget'),
-            mNotTarget: document.getElementById('metricNotTarget')
-        };
+    function toggleDropdownMenu(e, id) {
+      e.stopPropagation();
+      // Close all existing
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+      const menu = document.getElementById(`menu-${id}`);
+      if (menu) menu.classList.toggle('show');
+    }
 
-        // --- 3. Core Functions ---
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+      document.getElementById('stageSelectDropdown').classList.remove('show');
+    });
 
-        function init() {
-            bindEvents();
-            renderTals();
-            applyFilterEngine();
-            setupDragAndDrop();
+    // TAL Handlers
+    function toggleTalSelection(id) {
+      const tal = state.tals.find(t => t.id === id);
+      if (!tal) return;
+      if (!tal.active) {
+        showToast('Cannot select an inactive list. Activate it first.', 'fa-exclamation-triangle');
+        return;
+      }
+      tal.selected = !tal.selected;
+      renderSidebar();
+      renderMainDashboard();
+      logActivity('TAL Selected', `${tal.selected ? 'Selected' : 'Deselected'} "${tal.name}"`, 'tal', 'fa-list-check');
+    }
+
+    function toggleTalActiveStatus(e, id) {
+      if (e) e.stopPropagation();
+      const tal = state.tals.find(t => t.id === id);
+      if (!tal) return;
+      tal.active = !tal.active;
+      if (!tal.active) tal.selected = false; // Deselect automatically
+      tal.allowDelete = false; // Modifying status locks deletion capability
+      renderSidebar();
+      renderMainDashboard();
+      logActivity('TAL Status Modified', `Set list "${tal.name}" to ${tal.active ? 'Active' : 'Inactive'}`, 'tal', 'fa-toggle-on');
+      showToast(`List status set to ${tal.active ? 'Active' : 'Inactive'}`);
+    }
+
+    function cloneTal(e, id) {
+      if (e) e.stopPropagation();
+      const original = state.tals.find(t => t.id === id);
+      if (!original) return;
+
+      const newTal = {
+        id: `tal-${Date.now()}`,
+        name: `Copy of ${original.name}`,
+        active: true,
+        selected: true,
+        createdAt: getCurrentTimestamp(),
+        allowDelete: true, // New fresh cloned list CAN be deleted until modified/used
+        leads: generateMockLeads(10, `Copy of ${original.name}`)
+      };
+
+      state.tals.push(newTal);
+      renderSidebar();
+      renderMainDashboard();
+      logActivity('TAL Cloned', `Cloned new list "${newTal.name}" from "${original.name}"`, 'tal', 'fa-copy');
+      showToast(`Cloned list "${original.name}" successfully!`);
+    }
+
+    function enableTalEdit(e, id) {
+      if (e) e.stopPropagation();
+      const tal = state.tals.find(t => t.id === id);
+      if (!tal) return;
+
+      const nameSpan = document.getElementById(`name-${id}`);
+      if (!nameSpan) return;
+
+      const currentText = tal.name;
+      nameSpan.innerHTML = `
+        <input type="text" class="tal-edit-input" id="editInput-${id}" value="${escapeHtml(currentText)}" onclick="event.stopPropagation()">
+      `;
+
+      const input = document.getElementById(`editInput-${id}`);
+      input.focus();
+
+      input.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Enter') saveTalEdit(id, input.value);
+        if (evt.key === 'Escape') renderSidebar();
+      });
+    }
+
+    function saveTalEdit(id, newName) {
+      const tal = state.tals.find(t => t.id === id);
+      if (!tal) return;
+      if (!newName.trim()) {
+        renderSidebar();
+        return;
+      }
+      const oldName = tal.name;
+      tal.name = newName.trim();
+      tal.allowDelete = false; // Modifying name locks deletion capability permanently
+      tal.leads = generateMockLeads(10, tal.name);
+      renderSidebar();
+      renderMainDashboard();
+      logActivity('TAL Renamed', `Renamed list "${oldName}" to "${tal.name}" (Delete Locked)`, 'tal', 'fa-pen');
+      showToast(`Updated list name to "${tal.name}"`);
+    }
+
+    function deleteTal(e, id) {
+      if (e) e.stopPropagation();
+      const tal = state.tals.find(t => t.id === id);
+      if (!tal) return;
+
+      if (!tal.allowDelete) {
+        showToast(`"${tal.name}" is modified / in-use and cannot be deleted!`, 'fa-lock');
+        logActivity('Delete Blocked', `Attempted to delete modified/in-use TAL "${tal.name}"`, 'tal', 'fa-lock');
+        return;
+      }
+
+      if (confirm(`Are you sure you want to delete "${tal.name}"?`)) {
+        state.tals = state.tals.filter(t => t.id !== id);
+        renderSidebar();
+        renderMainDashboard();
+        logActivity('TAL Deleted', `Deleted list "${tal.name}"`, 'tal', 'fa-trash');
+        showToast(`Deleted list "${tal.name}"`);
+      }
+    }
+
+    // ==========================================
+    // FILTER ENGINE & DATA AGGREGATION
+    // ==========================================
+
+    function getAggregatedLeads() {
+      // Aggregate leads from all selected & active TALs
+      return state.tals
+        .filter(t => t.active && t.selected)
+        .flatMap(t => t.leads);
+    }
+
+    function evaluateLeadMatch(lead) {
+      // 1. Email
+      const emailEl = document.getElementById('filterEmail');
+      if (emailEl && emailEl.value.trim()) {
+        const emailVal = emailEl.value.trim().toLowerCase();
+        const matches = lead.email.toLowerCase().includes(emailVal);
+        if (state.fieldModes.email === 'include' && !matches) return false;
+        if (state.fieldModes.email === 'exclude' && matches) return false;
+      }
+
+      // 2. Domain
+      const domainEl = document.getElementById('filterDomain');
+      if (domainEl && domainEl.value.trim()) {
+        const domainVal = domainEl.value.trim().toLowerCase();
+        const matches = lead.domain.toLowerCase().includes(domainVal);
+        if (state.fieldModes.domain === 'include' && !matches) return false;
+        if (state.fieldModes.domain === 'exclude' && matches) return false;
+      }
+
+      // 3. Company
+      const companyEl = document.getElementById('filterCompany');
+      if (companyEl && companyEl.value.trim()) {
+        const companyVal = companyEl.value.trim().toLowerCase();
+        const matches = lead.company.toLowerCase().includes(companyVal);
+        if (state.fieldModes.company === 'include' && !matches) return false;
+        if (state.fieldModes.company === 'exclude' && matches) return false;
+      }
+
+      // 4. Geo Country
+      const geoEl = document.getElementById('filterGeo');
+      if (geoEl && geoEl.value.trim()) {
+        const geoInput = geoEl.value.trim();
+        const geoList = geoInput.split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
+        const matches = geoList.includes(lead.geo.toLowerCase());
+        if (!matches) return false;
+      }
+
+      // 5. Priority Range
+      const minPEl = document.getElementById('filterPriorityMin');
+      const maxPEl = document.getElementById('filterPriorityMax');
+      const minP = minPEl ? parseInt(minPEl.value, 10) : NaN;
+      const maxP = maxPEl ? parseInt(maxPEl.value, 10) : NaN;
+      if (!isNaN(minP) && lead.priority < minP) return false;
+      if (!isNaN(maxP) && lead.priority > maxP) return false;
+
+      // 6. Domain CPC
+      const cpcEl = document.getElementById('filterCpc');
+      if (cpcEl && cpcEl.value.trim()) {
+        const cpcInput = cpcEl.value.trim();
+        const cpcList = cpcInput.split(',').map(c => parseFloat(c.trim())).filter(c => !isNaN(c));
+        const matches = cpcList.some(val => Math.abs(val - lead.cpc) < 0.01);
+        if (!matches) return false;
+      }
+
+      // 7. Buyer Research Stage
+      const selectedStages = Array.from(document.querySelectorAll('.stage-cb:checked')).map(cb => cb.value);
+      if (selectedStages.length > 0) {
+        if (!selectedStages.includes(lead.stage)) return false;
+      }
+
+      // 8. ABM Status
+      if (state.activeAbm !== 'All') {
+        if (lead.abm !== state.activeAbm) return false;
+      }
+
+      return true;
+    }
+
+    // ==========================================
+    // DASHBOARD & TABLE RENDER LOGIC
+    // ==========================================
+    function renderMainDashboard() {
+      const baseLeads = getAggregatedLeads();
+
+      // Update Header Inclusion/Exclusion Table Visual Styling
+      updateTableColumnHeaderStyles();
+
+      // Process Leads according to View Mode & Filters
+      const evaluatedLeads = baseLeads.map(l => ({
+        ...l,
+        isMatch: evaluateLeadMatch(l)
+      }));
+
+      let displayLeads = [];
+      if (state.filtersApplied && state.viewMode === 'mapped') {
+        // View Mapped TAL: ONLY contains records which are matching
+        displayLeads = evaluatedLeads.filter(l => l.isMatch);
+      } else {
+        // View Complete TAL & View Filtered TAL (or when filters not yet fetched): Contains all records
+        displayLeads = evaluatedLeads;
+      }
+
+      // Update Metrics Cards based on current view
+      document.getElementById('statTotalLeads').textContent = displayLeads.length;
+      document.getElementById('statTargetLeads').textContent = displayLeads.filter(l => l.abm === 'Target').length;
+      document.getElementById('statDoNotTargetLeads').textContent = displayLeads.filter(l => l.abm === 'DoNotTarget').length;
+
+      // Update View Modes Active & Disabled Styling
+      const viewBtns = document.querySelectorAll('.btn-view-mode');
+      viewBtns.forEach(btn => {
+        const mode = btn.dataset.view;
+        if (mode === 'complete') {
+          btn.classList.remove('disabled-btn');
+        } else {
+          if (state.filtersApplied) {
+            btn.classList.remove('disabled-btn');
+          } else {
+            btn.classList.add('disabled-btn');
+          }
         }
 
-        function showToast(msg) {
-            document.getElementById('appToastMessage').innerHTML = `<i class="fa-solid fa-terminal me-2 text-info"></i> ${msg}`;
-            const toast = new bootstrap.Toast(document.getElementById('appToast'));
-            toast.show();
+        if (mode === state.viewMode) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
         }
+      });
 
-        function generateMockLeads(count) {
-            const shuffled = [...dummyLeads].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count).map(l => l.domain);
+      // Revealed Detail Columns Visibility (Revealed when filtersApplied is true after Fetch TAL)
+      const showDetails = state.filtersApplied;
+      const detailCols = document.querySelectorAll('.col-revealed-detail');
+      detailCols.forEach(col => {
+        if (showDetails) {
+          col.classList.remove('hidden-col');
+          col.classList.add('revealed-col');
+        } else {
+          col.classList.remove('revealed-col');
+          col.classList.add('hidden-col');
         }
+      });
 
-        function getRadioVal(nodeList) {
-            for (let node of nodeList) { if (node.checked) return node.value; }
-            return null;
-        }
+      // Pagination Calculation
+      const totalCount = displayLeads.length;
+      const totalPages = Math.ceil(totalCount / state.pageSize) || 1;
+      if (state.currentPage > totalPages) state.currentPage = totalPages;
 
-        function setRadioVal(nodeList, val) {
-            for (let node of nodeList) {
-                if (node.value === val) { node.checked = true; break; }
+      const startIndex = (state.currentPage - 1) * state.pageSize;
+      const paginatedLeads = displayLeads.slice(startIndex, startIndex + state.pageSize);
+
+      // Render Table Body Rows
+      const tbody = document.getElementById('leadsTableBody');
+      tbody.innerHTML = '';
+
+      if (paginatedLeads.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="14" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              <i class="fa-solid fa-folder-open" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; opacity: 0.4;"></i>
+              No leads match the active selection or filters.
+            </td>
+          </tr>
+        `;
+      } else {
+        paginatedLeads.forEach(lead => {
+          const tr = document.createElement('tr');
+
+          // Highlight matching rows in soft blue in View Filtered Mode
+          if (state.viewMode === 'filtered' && lead.isMatch) {
+            tr.classList.add('row-highlight-blue');
+          }
+
+          // Check cell exclusion styling for Email, Domain, Company Name
+          const emailClass = state.fieldModes.email === 'exclude' ? 'col-greyed' : '';
+          const domainClass = state.fieldModes.domain === 'exclude' ? 'col-greyed' : '';
+          const companyClass = state.fieldModes.company === 'exclude' ? 'col-greyed' : '';
+
+          // Detail column value rules when fetched (showDetails = true):
+          // - View Complete TAL: shows actual data for ALL records
+          // - View Filtered TAL: matching rows show actual values, non-matching rows show "-"
+          // - View Mapped TAL: all displayed rows are matches so they show actual values
+          let isDetailVisible = false;
+          if (showDetails) {
+            if (state.viewMode === 'complete') {
+              isDetailVisible = true; // Complete view shows all detail values for all records
+            } else if (state.viewMode === 'filtered') {
+              isDetailVisible = lead.isMatch; // Filtered view shows detail values for matching rows, "-" for non-matching
+            } else if (state.viewMode === 'mapped') {
+              isDetailVisible = true; // Mapped view contains only matching rows
             }
+          }
+
+          const indVal = isDetailVisible ? lead.industry : '-';
+          const empVal = isDetailVisible ? lead.empSize : '-';
+          const hqVal = isDetailVisible ? lead.hqCountry : '-';
+          const linkVal = isDetailVisible 
+            ? `<a href="${lead.linkedin}" target="_blank" style="color: var(--primary);"><i class="fa-brands fa-linkedin"></i> Profile</a>` 
+            : '-';
+
+          // ABM Badge
+          let abmBadge = `<span class="badge badge-neutral">Neutral</span>`;
+          if (lead.abm === 'Target') abmBadge = `<span class="badge badge-target"><i class="fa-solid fa-circle-check" style="margin-right: 3px;"></i> Target</span>`;
+          if (lead.abm === 'DoNotTarget') abmBadge = `<span class="badge badge-donottarget"><i class="fa-solid fa-circle-xmark" style="margin-right: 3px;"></i> Do Not Target</span>`;
+
+          tr.innerHTML = `
+            <td><code>${lead.id}</code></td>
+            <td><strong>${escapeHtml(lead.name)}</strong></td>
+            <td class="${emailClass}">${escapeHtml(lead.email)}</td>
+            <td class="${domainClass}">${escapeHtml(lead.domain)}</td>
+            <td class="${companyClass}">${escapeHtml(lead.company)}</td>
+            <td>${lead.geo}</td>
+            <td><span style="font-weight: 700;">${lead.priority}</span></td>
+            <td>$${lead.cpc.toFixed(2)}</td>
+            <td>${lead.stage}</td>
+            <td>${abmBadge}</td>
+            <td class="col-revealed-detail ${showDetails ? 'revealed-col' : 'hidden-col'}">${indVal}</td>
+            <td class="col-revealed-detail ${showDetails ? 'revealed-col' : 'hidden-col'}">${empVal}</td>
+            <td class="col-revealed-detail ${showDetails ? 'revealed-col' : 'hidden-col'}">${hqVal}</td>
+            <td class="col-revealed-detail ${showDetails ? 'revealed-col' : 'hidden-col'}">${linkVal}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Render Pagination Footer
+      const endItem = Math.min(startIndex + state.pageSize, totalCount);
+      const startItem = totalCount > 0 ? startIndex + 1 : 0;
+      document.getElementById('paginationInfo').textContent = `Showing ${startItem} to ${endItem} of ${totalCount} leads`;
+
+      renderPaginationControls(totalPages);
+    }
+
+    function updateTableColumnHeaderStyles() {
+      const thEmail = document.getElementById('th-email');
+      const thDomain = document.getElementById('th-domain');
+      const thCompany = document.getElementById('th-company');
+
+      if (state.fieldModes.email === 'exclude') thEmail.classList.add('col-excluded');
+      else thEmail.classList.remove('col-excluded');
+
+      if (state.fieldModes.domain === 'exclude') thDomain.classList.add('col-excluded');
+      else thDomain.classList.remove('col-excluded');
+
+      if (state.fieldModes.company === 'exclude') thCompany.classList.add('col-excluded');
+      else thCompany.classList.remove('col-excluded');
+    }
+
+    function renderPaginationControls(totalPages) {
+      const container = document.getElementById('paginationControls');
+      container.innerHTML = '';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn';
+      prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+      prevBtn.disabled = state.currentPage === 1;
+      prevBtn.onclick = () => { if (state.currentPage > 1) { state.currentPage--; renderMainDashboard(); } };
+      container.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `page-btn ${i === state.currentPage ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.onclick = () => { state.currentPage = i; renderMainDashboard(); };
+        container.appendChild(btn);
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn';
+      nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+      nextBtn.disabled = state.currentPage === totalPages || totalPages === 0;
+      nextBtn.onclick = () => { if (state.currentPage < totalPages) { state.currentPage++; renderMainDashboard(); } };
+      container.appendChild(nextBtn);
+    }
+
+    // ==========================================
+    // EVENT LISTENERS & FILTER INTERACTIONS
+    // ==========================================
+
+    // Inline Add TAL
+    document.getElementById('btnToggleAddForm').addEventListener('click', () => {
+      const form = document.getElementById('inlineAddForm');
+      form.classList.toggle('active');
+    });
+
+    document.getElementById('btnCancelAdd').addEventListener('click', () => {
+      document.getElementById('inlineAddForm').classList.remove('active');
+    });
+
+    document.getElementById('btnSaveNewTal').addEventListener('click', () => {
+      const nameInput = document.getElementById('inputNewTalName');
+      const val = nameInput.value.trim();
+      if (!val) {
+        showToast('Please enter a list name.', 'fa-exclamation-circle');
+        return;
+      }
+
+      const newTal = {
+        id: `tal-${Date.now()}`,
+        name: val,
+        active: true,
+        selected: true,
+        createdAt: getCurrentTimestamp(),
+        allowDelete: true,
+        leads: generateMockLeads(10, val)
+      };
+
+      state.tals.push(newTal);
+      nameInput.value = '';
+      document.getElementById('inlineAddForm').classList.remove('active');
+      renderSidebar();
+      renderMainDashboard();
+      showToast(`Created TAL "${val}" with 10 unique leads!`);
+    });
+
+    // CSV Upload & Drag and Drop
+    const dropzone = document.getElementById('uploadDropzone');
+    const fileInput = document.getElementById('fileCsvInput');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+
+    function handleFileUpload(file) {
+      const rawName = file.name.replace(/\.[^/.]+$/, "");
+      const talName = rawName || "Uploaded TAL";
+
+      const newTal = {
+        id: `tal-${Date.now()}`,
+        name: talName,
+        active: true,
+        selected: true,
+        createdAt: getCurrentTimestamp(),
+        allowDelete: true,
+        leads: generateMockLeads(10, talName)
+      };
+
+      state.tals.push(newTal);
+      renderSidebar();
+      renderMainDashboard();
+      showToast(`Uploaded "${file.name}" and imported leads!`);
+    }
+
+    // Download Sample CSV
+    document.getElementById('btnDownloadSample').addEventListener('click', () => {
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "Name,Email,Domain,Company,Geo,Priority,CPC,Stage,ABM\n" +
+        "Jane Doe,jane.doe@acme.com,acme.com,Acme Corp,US,9,12.50,Decision,Target\n" +
+        "Alex Smith,alex@nexus.net,nexus.net,Nexus Cloud,CA,5,4.00,Awareness,Neutral";
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "sample_tal_leads.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast("Sample file downloaded successfully!");
+    });
+
+    // Live Input Listeners for all filter fields
+    ['filterEmail', 'filterDomain', 'filterCompany', 'filterGeo', 'filterPriorityMin', 'filterPriorityMax', 'filterCpc'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => {
+          state.filtersApplied = true;
+          if (state.viewMode === 'complete') state.viewMode = 'filtered';
+          renderMainDashboard();
+        });
+      }
+    });
+
+    // Inclusion/Exclusion Toggle Buttons
+    document.querySelectorAll('.toggle-switch-btn').forEach(group => {
+      const field = group.dataset.field;
+      const opts = group.querySelectorAll('.toggle-opt');
+      opts.forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.stopPropagation();
+          opts.forEach(o => o.classList.remove('active'));
+          opt.classList.add('active');
+          state.fieldModes[field] = opt.dataset.mode;
+          state.filtersApplied = true;
+          if (state.viewMode === 'complete') state.viewMode = 'filtered';
+          renderMainDashboard();
+          logActivity('Field Mode Changed', `Set ${field.toUpperCase()} toggle mode to ${opt.dataset.mode.toUpperCase()}`, 'filter', 'fa-sliders');
+          showToast(`Set ${field.toUpperCase()} mode to ${opt.dataset.mode.toUpperCase()}`);
+        });
+      });
+    });
+
+    // Custom Stage Multiselect
+    const stageTrigger = document.getElementById('stageSelectTrigger');
+    const stageDropdown = document.getElementById('stageSelectDropdown');
+
+    stageTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      stageDropdown.classList.toggle('show');
+    });
+
+    stageDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    document.querySelectorAll('.stage-cb').forEach(cb => {
+      cb.addEventListener('change', () => {
+        updateStageTriggerText();
+        logActivity('Research Stage Filter', `Selected stage: ${cb.value}`, 'filter', 'fa-chart-pie');
+      });
+    });
+
+    document.getElementById('btnClearStageSelection').addEventListener('click', () => {
+      document.querySelectorAll('.stage-cb').forEach(cb => cb.checked = false);
+      updateStageTriggerText();
+      logActivity('Research Stage Cleared', 'Cleared all research stage selections', 'filter', 'fa-chart-pie');
+    });
+
+    function updateStageTriggerText() {
+      const checked = Array.from(document.querySelectorAll('.stage-cb:checked')).map(cb => cb.value);
+      const textSpan = document.getElementById('stageSelectText');
+      if (checked.length === 0) {
+        textSpan.textContent = 'Select Stages...';
+      } else if (checked.length <= 2) {
+        textSpan.textContent = checked.join(', ');
+      } else {
+        textSpan.textContent = `${checked.length} Stages Selected`;
+      }
+      renderMainDashboard();
+    }
+
+    // Segmented ABM Status Pills
+    document.querySelectorAll('#abmPills .abm-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('#abmPills .abm-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        state.activeAbm = pill.dataset.abm;
+        renderMainDashboard();
+        logActivity('ABM Status Changed', `Set ABM Status filter to "${pill.dataset.abm}"`, 'filter', 'fa-bullseye');
+      });
+    });
+
+    // Fetch TAL (Apply Filters)
+    document.getElementById('btnFetchTal').addEventListener('click', () => {
+      state.filtersApplied = true;
+      state.viewMode = 'filtered'; // Default to View Filtered on Fetch
+      state.currentPage = 1;
+      
+      // Lock deletion capability on all currently selected TALs as they are now in-use
+      state.tals.forEach(t => {
+        if (t.selected) t.allowDelete = false;
+      });
+
+      renderSidebar();
+      renderMainDashboard();
+      logActivity('Fetch TAL Executed', 'Applied active filters, evaluated matches, and locked active TAL deletion', 'action', 'fa-bolt');
+      showToast('Filters applied! Revealed detail columns and view modes.');
+    });
+
+    // View Mode Buttons
+    document.querySelectorAll('.btn-view-mode').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetView = btn.dataset.view;
+        if (targetView !== 'complete' && !state.filtersApplied) {
+          showToast("Please click 'Fetch TAL (Apply Filters)' first to apply filters!", "fa-exclamation-circle");
+          return;
+        }
+        state.viewMode = targetView;
+        state.currentPage = 1;
+        renderMainDashboard();
+        logActivity('View Mode Switched', `Active view changed to "${btn.textContent.trim()}"`, 'view', 'fa-eye');
+        showToast(`Switched view to "${btn.textContent.trim()}"`);
+      });
+    });
+
+    // Reset All Filters
+    document.getElementById('btnResetAll').addEventListener('click', () => {
+      state.filtersApplied = false;
+      state.viewMode = 'complete';
+      state.currentPage = 1;
+      state.activeAbm = 'All';
+
+      // Clear existing input fields safely
+      ['filterGeo', 'filterPriorityMin', 'filterPriorityMax', 'filterCpc'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      // Reset switches to Exclude default
+      document.querySelectorAll('.toggle-switch-btn').forEach(group => {
+        const field = group.dataset.field;
+        state.fieldModes[field] = 'exclude';
+        const opts = group.querySelectorAll('.toggle-opt');
+        opts.forEach(o => {
+          if (o.dataset.mode === 'exclude') o.classList.add('active');
+          else o.classList.remove('active');
+        });
+      });
+
+      // Clear stage checkboxes
+      document.querySelectorAll('.stage-cb').forEach(cb => cb.checked = false);
+      updateStageTriggerText();
+
+      // Reset ABM pills
+      document.querySelectorAll('#abmPills .abm-pill').forEach(p => p.classList.remove('active'));
+      const allPill = document.querySelector('#abmPills .abm-pill[data-abm="All"]');
+      if (allPill) allPill.classList.add('active');
+
+      renderMainDashboard();
+      logActivity('All Filters Reset', 'Reset all fields and toggle modes to default (Exclude)', 'reset', 'fa-rotate-left');
+      showToast('All filters reset to default. Click "Fetch TAL" to apply new filters.');
+    });
+
+    // Save Preset Modal Logic
+    const presetModal = document.getElementById('savePresetModal');
+    document.getElementById('btnOpenSavePresetModal').addEventListener('click', () => {
+      presetModal.classList.add('show');
+    });
+
+    document.getElementById('btnCancelPreset').addEventListener('click', () => {
+      presetModal.classList.remove('show');
+    });
+
+    document.getElementById('btnConfirmSavePreset').addEventListener('click', () => {
+      const nameInput = document.getElementById('inputPresetName');
+      const name = nameInput.value.trim();
+      if (!name) {
+        showToast('Please enter a preset name.', 'fa-exclamation-circle');
+        return;
+      }
+
+      // Capture active filter state safely
+      const preset = {
+        id: `preset-${Date.now()}`,
+        name: name,
+        geo: document.getElementById('filterGeo')?.value || '',
+        priorityMin: document.getElementById('filterPriorityMin')?.value || '',
+        priorityMax: document.getElementById('filterPriorityMax')?.value || '',
+        cpc: document.getElementById('filterCpc')?.value || '',
+        stages: Array.from(document.querySelectorAll('.stage-cb:checked')).map(cb => cb.value),
+        abm: state.activeAbm,
+        fieldModes: { ...state.fieldModes }
+      };
+
+      state.savedPresets.push(preset);
+      nameInput.value = '';
+      presetModal.classList.remove('show');
+      renderPresetChips();
+      showToast(`Filter preset "${name}" saved!`);
+    });
+
+    function renderPresetChips() {
+      const bar = document.getElementById('presetsBar');
+      bar.innerHTML = '';
+
+      state.savedPresets.forEach(preset => {
+        const chip = document.createElement('div');
+        chip.className = 'preset-chip';
+        chip.innerHTML = `
+          <i class="fa-solid fa-bookmark"></i>
+          <span>${escapeHtml(preset.name)}</span>
+          <i class="fa-solid fa-xmark delete-chip" onclick="deletePreset(event, '${preset.id}')"></i>
+        `;
+
+        chip.addEventListener('click', (e) => {
+          if (e.target.classList.contains('delete-chip')) return;
+          applyPreset(preset);
+        });
+
+        bar.appendChild(chip);
+      });
+    }
+
+    function applyPreset(preset) {
+      if (document.getElementById('filterGeo')) document.getElementById('filterGeo').value = preset.geo || '';
+      if (document.getElementById('filterPriorityMin')) document.getElementById('filterPriorityMin').value = preset.priorityMin || '';
+      if (document.getElementById('filterPriorityMax')) document.getElementById('filterPriorityMax').value = preset.priorityMax || '';
+      if (document.getElementById('filterCpc')) document.getElementById('filterCpc').value = preset.cpc || '';
+
+      // Set field modes
+      state.fieldModes = { ...preset.fieldModes };
+      document.querySelectorAll('.toggle-switch-btn').forEach(group => {
+        const field = group.dataset.field;
+        const mode = state.fieldModes[field];
+        const opts = group.querySelectorAll('.toggle-opt');
+        opts.forEach(o => {
+          if (o.dataset.mode === mode) o.classList.add('active');
+          else o.classList.remove('active');
+        });
+      });
+
+      // Stages
+      document.querySelectorAll('.stage-cb').forEach(cb => {
+        cb.checked = preset.stages.includes(cb.value);
+      });
+      updateStageTriggerText();
+
+      // ABM
+      state.activeAbm = preset.abm || 'All';
+      document.querySelectorAll('#abmPills .abm-pill').forEach(p => {
+        if (p.dataset.abm === state.activeAbm) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+
+      // Automatically apply filters
+      state.filtersApplied = true;
+      state.viewMode = 'filtered';
+      renderMainDashboard();
+      showToast(`Applied filter preset "${preset.name}"`);
+    }
+
+    function deletePreset(e, id) {
+      e.stopPropagation();
+      state.savedPresets = state.savedPresets.filter(p => p.id !== id);
+      renderPresetChips();
+      showToast('Preset removed.');
+    }
+
+    // Export Leads Button
+    document.getElementById('btnExportLeads').addEventListener('click', () => {
+      const baseLeads = getAggregatedLeads();
+      if (baseLeads.length === 0) {
+        showToast('No leads available to export.', 'fa-exclamation-circle');
+        return;
+      }
+
+      let csv = "Lead ID,Name,Email,Domain,Company,Geo,Priority,CPC,Stage,ABM\n";
+      baseLeads.forEach(l => {
+        csv += `"${l.id}","${l.name}","${l.email}","${l.domain}","${l.company}","${l.geo}",${l.priority},${l.cpc},"${l.stage}","${l.abm}"\n`;
+      });
+
+      const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Leads_Export_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      logActivity('Leads Exported', `Exported ${baseLeads.length} leads to CSV`, 'action', 'fa-file-export');
+      showToast("Leads exported successfully!");
+    });
+
+    // Helper Utilities
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    function getCurrentTimestamp() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
+    // ==========================================
+    // TAL MANAGER DRAWER TOGGLE LOGIC
+    // ==========================================
+    const mainSidebar = document.getElementById('mainSidebar');
+    const talManagerBtn = document.getElementById('btnToggleTalManager');
+    const closeSidebarBtn = document.getElementById('btnCloseSidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+    function openTalManager() {
+      if (mainSidebar) mainSidebar.classList.add('open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+    }
+
+    function closeTalManager() {
+      if (mainSidebar) mainSidebar.classList.remove('open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+    }
+
+    if (talManagerBtn) talManagerBtn.addEventListener('click', (e) => { e.stopPropagation(); openTalManager(); });
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeTalManager);
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeTalManager);
+
+    // ==========================================
+    // ACTIVITY LOG DRAWER TOGGLE LOGIC
+    // ==========================================
+    const activityLogDrawer = document.getElementById('activityLogDrawer');
+    const logBtn = document.getElementById('btnToggleActivityLog');
+    const closeLogBtn = document.getElementById('btnCloseLogDrawer');
+    const logBackdrop = document.getElementById('logBackdrop');
+    const inputSearchLogs = document.getElementById('inputSearchLogs');
+    const btnClearLog = document.getElementById('btnClearLog');
+    const btnExportLog = document.getElementById('btnExportLog');
+
+    function openActivityLog() {
+      if (activityLogDrawer) activityLogDrawer.classList.add('open');
+      if (logBackdrop) logBackdrop.classList.add('show');
+      renderLogTimeline();
+    }
+
+    function closeActivityLog() {
+      if (activityLogDrawer) activityLogDrawer.classList.remove('open');
+      if (logBackdrop) logBackdrop.classList.remove('show');
+    }
+
+    if (logBtn) logBtn.addEventListener('click', (e) => { e.stopPropagation(); openActivityLog(); });
+    if (closeLogBtn) closeLogBtn.addEventListener('click', closeActivityLog);
+    if (logBackdrop) logBackdrop.addEventListener('click', closeActivityLog);
+
+    if (inputSearchLogs) {
+      inputSearchLogs.addEventListener('input', () => {
+        renderLogTimeline();
+      });
+    }
+
+    if (btnClearLog) {
+      btnClearLog.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all activity history?')) {
+          state.activityLogs = [];
+          saveActivityLogs();
+          updateLogBadgeCount();
+          renderLogTimeline();
+          showToast('Activity log history cleared.');
+        }
+      });
+    }
+
+    if (btnExportLog) {
+      btnExportLog.addEventListener('click', () => {
+        if (state.activityLogs.length === 0) {
+          showToast('No activity logs available to export.', 'fa-exclamation-circle');
+          return;
         }
 
-        function getSelectedStages() {
-            return Array.from(els.stageCbs).filter(cb => cb.checked).map(cb => cb.value);
-        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.activityLogs, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `Activity_Log_${Date.now()}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        showToast('Activity log exported as JSON!');
+      });
+    }
 
-        function updateStageText() {
-            const stages = getSelectedStages();
-            if (stages.length === 0) els.stageBtnText.innerText = "All Stages";
-            else if (stages.length <= 2) els.stageBtnText.innerText = stages.join(", ");
-            else els.stageBtnText.innerText = `${stages.length} Stages Selected`;
-        }
+    // Initial Execution
+    renderSidebar();
+    renderMainDashboard();
+    updateLogBadgeCount();
+    logActivity('Dashboard Active', 'Target Account List Dashboard session initialized', 'view', 'fa-desktop');
 
-        // --- UI Interactions ---
-        function bindEvents() {
-            // TAL Add Logic
-            els.addTalBtn.addEventListener('click', () => els.addTalForm.classList.remove('d-none'));
-            els.cancelTalBtn.addEventListener('click', () => { els.addTalForm.classList.add('d-none'); els.newTalNameInput.value = ''; });
-            els.saveTalBtn.addEventListener('click', () => {
-                const name = els.newTalNameInput.value.trim();
-                if (name) {
-                    talLists.push({ id: 'tal-' + Date.now(), name, active: true, leads: generateMockLeads(10), savedFilters: null });
-                    els.addTalForm.classList.add('d-none');
-                    els.newTalNameInput.value = '';
-                    renderTals();
-                    applyFilterEngine();
-                    showToast("Module registered successfully with 10 random leads");
-                }
-            });
-            els.newTalNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') els.saveTalBtn.click(); });
-            
-            // TAL Upload Logic
-            els.uploadTalBtn.addEventListener('click', () => els.csvFileInput.click());
-            els.csvFileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) handleTalUpload(file.name);
-                els.csvFileInput.value = ''; // reset
-            });
-
-            // File Download & Export
-            els.downloadSampleBtn.addEventListener('click', () => showToast("Sample file downloaded successfully!"));
-            els.exportLeadsBtn.addEventListener('click', () => showToast("Leads exported successfully!"));
-
-            // Live Filter Triggers
-            const liveInputs = [
-                ...els.sideTalAbm, ...els.sideTalStatus, ...els.emailMode, ...els.domainMode, ...els.companyMode,
-                els.geoMode, els.geoInput, els.priMin, els.priMax, els.cpcMode, els.cpcInput, ...els.abmFilter
-            ];
-            liveInputs.forEach(input => {
-                input.addEventListener('change', applyFilterEngine);
-                if (input.type === 'text' || input.type === 'number') input.addEventListener('input', applyFilterEngine);
-            });
-            els.stageCbs.forEach(cb => cb.addEventListener('change', () => { updateStageText(); applyFilterEngine(); }));
-            els.clearStagesBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                els.stageCbs.forEach(cb => cb.checked = false);
-                updateStageText();
-                applyFilterEngine();
-            });
-
-            // Bind Tabs
-            const tabBtns = document.querySelectorAll('#dataTabs .nav-link');
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    tabBtns.forEach(b => {
-                        b.classList.remove('active');
-                        b.style.color = 'var(--text-muted)';
-                    });
-                    e.target.classList.add('active');
-                    e.target.style.color = 'var(--text-main)';
-                    currentTab = e.target.getAttribute('data-tab-value');
-                    applyFilterEngine();
-                });
-            });
-
-            // Controls
-            els.resetBtn.addEventListener('click', () => {
-                setRadioVal(els.sideTalAbm, 'Yes');
-                setRadioVal(els.sideTalStatus, 'Active');
-                setRadioVal(els.emailMode, 'Include');
-                setRadioVal(els.domainMode, 'Include');
-                setRadioVal(els.companyMode, 'Include');
-                els.geoMode.value = 'Include'; els.geoInput.value = '';
-                els.priMin.value = ''; els.priMax.value = '';
-                els.cpcMode.value = 'Include'; els.cpcInput.value = '';
-                els.stageCbs.forEach(cb => cb.checked = false); updateStageText();
-                setRadioVal(els.abmFilter, 'All');
-                
-                filtersApplied = false;
-                
-                // Disable tabs, set Complete tab as active
-                tabBtns.forEach(b => b.disabled = true);
-                const completeTab = document.getElementById('tab-complete');
-                completeTab.disabled = false;
-                completeTab.click();
-
-                renderTals();
-                applyFilterEngine();
-                showToast("System cache purged");
-            });
-
-            els.applyBtn.addEventListener('click', () => {
-                filtersApplied = true;
-                // Enable view modes
-                tabBtns.forEach(b => b.disabled = false);
-                applyFilterEngine();
-                showToast("Data fetch cycle executed");
-            });
-
-            // Save Filters Preset
-            els.saveFilterBtn.addEventListener('click', () => {
-                const name = prompt("Enter a name for this filter preset:");
-                if (name && name.trim()) {
-                    savedGlobalFilters.push({
-                        id: 'preset-' + Date.now(),
-                        name: name.trim(),
-                        filters: {
-                            geoMode: els.geoMode.value, geoInput: els.geoInput.value,
-                            priMin: els.priMin.value, priMax: els.priMax.value,
-                            cpcMode: els.cpcMode.value, cpcInput: els.cpcInput.value,
-                            abmFilter: getRadioVal(els.abmFilter),
-                            selectedStages: getSelectedStages(),
-                            emailMode: getRadioVal(els.emailMode),
-                            domainMode: getRadioVal(els.domainMode),
-                            companyMode: getRadioVal(els.companyMode)
-                        }
-                    });
-                    renderFilterChips();
-                    showToast(`Filter preset "${name.trim()}" saved.`);
-                }
-            });
-        }
-
-        function setupDragAndDrop() {
-            document.body.addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); });
-            document.body.addEventListener('drop', e => {
-                e.preventDefault(); e.stopPropagation();
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                    const file = e.dataTransfer.files[0];
-                    if (file.name.endsWith('.csv')) {
-                        handleTalUpload(file.name);
-                    } else {
-                        showToast("Please upload a valid .csv file.");
-                    }
-                }
-            });
-        }
-
-        function handleTalUpload(filename) {
-            const talName = filename.replace('.csv', '');
-            const newId = 'tal-' + Date.now();
-            talLists.push({ id: newId, name: talName, active: true, leads: generateMockLeads(10), savedFilters: null });
-            renderTals();
-            applyFilterEngine();
-            showToast(`External data uplink complete. TAL "${talName}" created with custom leads.`);
-        }
-
-        // --- Saved Filters Presets ---
-        function renderFilterChips() {
-            els.savedFiltersContainer.innerHTML = '';
-            if (savedGlobalFilters.length === 0) {
-                els.savedFiltersContainer.classList.add('empty-d-none');
-                return;
-            }
-            els.savedFiltersContainer.classList.remove('empty-d-none');
-            
-            savedGlobalFilters.forEach((preset, index) => {
-                const chip = document.createElement('div');
-                chip.className = 'badge bg-light text-dark border d-flex align-items-center p-2 shadow-sm rounded-pill';
-                chip.style.cursor = 'pointer';
-                chip.innerHTML = `
-                    <i class="fa-solid fa-filter me-2 text-primary"></i> <span class="me-2 fw-medium">${preset.name}</span>
-                    <button class="btn-close ms-2" style="font-size: 8px;"></button>
-                `;
-                
-                chip.querySelector('span').addEventListener('click', () => {
-                    loadSavedFilters(preset.filters);
-                    applyFilterEngine();
-                    showToast(`Applied preset "${preset.name}"`);
-                });
-
-                chip.querySelector('.btn-close').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    savedGlobalFilters.splice(index, 1);
-                    renderFilterChips();
-                    showToast(`Preset deleted.`);
-                });
-
-                els.savedFiltersContainer.appendChild(chip);
-            });
-        }
-
-        // --- TAL Management ---
-        function renderTals() {
-            els.talContainer.innerHTML = '';
-            talLists.forEach((tal, index) => {
-                const isSelected = tal.active;
-                
-                const div = document.createElement('div');
-                div.className = `tal-list-item ${isSelected ? 'selected' : ''}`;
-                
-                div.innerHTML = `
-                    <div class="form-check form-switch m-0 me-2" onclick="event.stopPropagation();" title="Toggle Active Status">
-                        <input class="form-check-input tal-active-toggle" type="checkbox" style="cursor: pointer; margin-top: 0.15rem;" ${tal.active ? 'checked' : ''}>
-                    </div>
-                    <div class="text-truncate fw-semibold" style="max-width: 140px;">${tal.name}</div>
-                    <div class="tal-actions dropdown ms-auto" onclick="event.stopPropagation();">
-                        <button class="btn btn-link btn-sm text-dark-50 p-0" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical px-2"></i></button>
-                        <ul class="dropdown-menu dropdown-menu-glass dropdown-menu-end shadow" style="font-size: 12px;">
-                            <li><a class="dropdown-item clone-tal" href="#"><i class="fa-solid fa-clone me-2 text-info w-15px"></i> Duplicate</a></li>
-                            <li><a class="dropdown-item edit-tal" href="#"><i class="fa-solid fa-pen-nib me-2 text-warning w-15px"></i> Rename & Regen</a></li>
-                            ${tal.allowDelete !== false ? '<li><hr class="dropdown-divider border-secondary"></li><li><a class="dropdown-item text-danger delete-tal" href="#"><i class="fa-solid fa-skull me-2 w-15px"></i> Delete</a></li>' : ''}
-                        </ul>
-                    </div>
-                `;
-
-                div.addEventListener('click', () => {
-                    talLists[index].active = !talLists[index].active;
-                    renderTals();
-                    applyFilterEngine();
-                });
-
-                div.querySelector('.tal-active-toggle').addEventListener('change', (e) => {
-                    e.stopPropagation();
-                    talLists[index].active = e.target.checked;
-                    renderTals(); applyFilterEngine();
-                });
-
-                const menu = div.querySelector('.dropdown-menu');
-                menu.querySelector('.clone-tal').addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    const clone = JSON.parse(JSON.stringify(tal));
-                    clone.id = 'tal-' + Date.now();
-                    clone.name = 'Copy of ' + clone.name;
-                    clone.leads = generateMockLeads(10);
-                    talLists.push(clone);
-                    renderTals(); applyFilterEngine(); showToast("Module duplicated with unique dataset");
-                });
-                menu.querySelector('.edit-tal').addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    const newName = prompt("Rename Module (Will regenerate dataset and lock deletion):", tal.name);
-                    if (newName && newName !== tal.name) {
-                        talLists[index].name = newName;
-                        talLists[index].leads = generateMockLeads(10);
-                        talLists[index].allowDelete = false;
-                        renderTals(); applyFilterEngine();
-                        showToast("Module updated and locked");
-                    }
-                });
-                if (tal.allowDelete !== false) {
-                    menu.querySelector('.delete-tal').addEventListener('click', (e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        if(confirm(`Delete module ${tal.name}?`)) {
-                            talLists.splice(index, 1);
-                            renderTals(); applyFilterEngine(); showToast("Module terminated");
-                        }
-                    });
-                }
-
-                els.talContainer.appendChild(div);
-            });
-        }
-
-        function loadSavedFilters(f) {
-            els.geoMode.value = f.geoMode || 'Include';
-            els.geoInput.value = f.geoInput || '';
-            els.priMin.value = f.priMin || '';
-            els.priMax.value = f.priMax || '';
-            els.cpcMode.value = f.cpcMode || 'Include';
-            els.cpcInput.value = f.cpcInput || '';
-            setRadioVal(els.abmFilter, f.abmFilter || 'All');
-            
-            els.stageCbs.forEach(cb => cb.checked = f.selectedStages && f.selectedStages.includes(cb.value));
-            updateStageText();
-
-            setRadioVal(els.emailMode, f.emailMode || 'Include');
-            setRadioVal(els.domainMode, f.domainMode || 'Include');
-            setRadioVal(els.companyMode, f.companyMode || 'Include');
-        }
-
-        // --- Filter Engines ---
-        
-        function evaluateMultiValue(leadVal, rawInput, mode) {
-            if (!rawInput.trim()) return true;
-            const terms = rawInput.toLowerCase().split(',').map(s => s.trim()).filter(s => s);
-            const val = leadVal.toString().toLowerCase();
-            const match = terms.some(t => val.includes(t));
-            return mode === 'Include' ? match : !match;
-        }
-
-        function getHighlightContext() {
-            return {
-                geoM: els.geoMode.value, geoI: els.geoInput.value.trim(),
-                pMin: els.priMin.value, pMax: els.priMax.value,
-                cpcM: els.cpcMode.value, cpcI: els.cpcInput.value,
-                stages: getSelectedStages(),
-                abmF: getRadioVal(els.abmFilter)
-            };
-        }
-
-        function passesHighlightFilters(l, ctx) {
-            if (ctx.geoI && !evaluateMultiValue(l.geo, ctx.geoI, ctx.geoM)) return false;
-            if (ctx.cpcI) {
-                const inputNum = parseFloat(ctx.cpcI);
-                const isMatch = l.cpc === inputNum;
-                if (ctx.cpcM === 'Include' && !isMatch) return false;
-                if (ctx.cpcM === 'Exclude' && isMatch) return false;
-            }
-            if (ctx.pMin && l.priority < parseInt(ctx.pMin)) return false;
-            if (ctx.pMax && l.priority > parseInt(ctx.pMax)) return false;
-            if (ctx.stages.length > 0 && !ctx.stages.includes(l.stage)) return false;
-            if (ctx.abmF !== 'All' && l.abm !== ctx.abmF) return false;
-            return true;
-        }
-
-        function hasAnyHighlightRuleActive(ctx) {
-            return ctx.geoI !== '' || ctx.cpcI !== '' || ctx.pMin !== '' || ctx.pMax !== '' || ctx.stages.length > 0 || ctx.abmF !== 'All';
-        }
-
-        function applyFilterEngine() {
-            const activeTals = talLists.filter(t => t.active);
-            
-            // 1. Row Visibility
-            const sideAbm = getRadioVal(els.sideTalAbm);
-            const sideStatus = getRadioVal(els.sideTalStatus);
-            
-            const activeDomains = new Set();
-            activeTals.forEach(t => t.leads.forEach(d => activeDomains.add(d)));
-
-            let visibleLeads = dummyLeads.filter(l => {
-                if (activeTals.length === 0) return false;
-                if (!activeDomains.has(l.domain)) return false;
-                if (sideAbm === 'No' && l.abm === 'Target') return false;
-                if (sideStatus === 'Inactive' && l.priority > 2) return false;
-                return true;
-            });
-
-            // Set Meta Columns state
-            const metaCols = document.querySelectorAll('.meta-col');
-            const leadsTable = document.getElementById('leadsTable');
-            if (filtersApplied && currentTab !== 'Complete') {
-                metaCols.forEach(c => c.classList.remove('col-hidden'));
-                leadsTable.classList.add('data-fetched');
-            } else {
-                metaCols.forEach(c => c.classList.add('col-hidden'));
-                leadsTable.classList.remove('data-fetched');
-            }
-
-            // Exclusion Styling
-            document.getElementById('th-email').classList.toggle('col-greyed', getRadioVal(els.emailMode) === 'Exclude');
-            document.getElementById('th-domain').classList.toggle('col-greyed', getRadioVal(els.domainMode) === 'Exclude');
-            document.getElementById('th-company').classList.toggle('col-greyed', getRadioVal(els.companyMode) === 'Exclude');
-
-            // 2. Highlighting & View Modes
-            const ctx = getHighlightContext();
-
-            if (currentTab === 'Mapped' && filtersApplied) {
-                // View Mapped TAL: Hides all non-matching rows entirely
-                visibleLeads = visibleLeads.filter(l => passesHighlightFilters(l, ctx));
-            }
-
-            // Save to cache for pagination
-            visibleLeadsCache = visibleLeads;
-            currentPage = 1;
-            renderPagination();
-            renderPage();
-            
-            // Metrics
-            els.mTotal.innerText = visibleLeads.length;
-            els.mTarget.innerText = visibleLeads.filter(l => l.abm === 'Target').length;
-            els.mNotTarget.innerText = visibleLeads.filter(l => l.abm === 'DoNotTarget').length;
-        }
-
-        // --- Render Engine ---
-
-        function getStageBadge(stage) {
-            if (stage === 'Awareness') return `<span class="badge-stage badge-awareness">Awareness</span>`;
-            if (stage === 'Consideration') return `<span class="badge-stage badge-consideration">Consideration</span>`;
-            if (stage === 'Decision') return `<span class="badge-stage badge-decision">Decision</span>`;
-            if (stage === 'Interest') return `<span class="badge-stage badge-interest">Interest</span>`;
-            return `—`;
-        }
-
-        function getPriDot(pri) {
-            if (pri <= 2) return `<span class="pri-dot pri-red"></span>`;
-            if (pri <= 4) return `<span class="pri-dot pri-amber"></span>`;
-            if (pri <= 7) return `<span class="pri-dot pri-blue"></span>`;
-            return `<span class="pri-dot pri-green"></span>`;
-        }
-
-        function getAbmBadge(abm) {
-            if (abm === 'Target') return `<span class="badge-abm badge-target">Target</span>`;
-            if (abm === 'DoNotTarget') return `<span class="badge-abm badge-notarget">Do Not Target</span>`;
-            return `—`;
-        }
-        
-        function renderPagination() {
-            const totalItems = visibleLeadsCache.length;
-            const totalPages = Math.ceil(totalItems / rowsPerPage);
-            
-            if (totalItems === 0) {
-                els.pageInfo.innerText = "Showing 0 to 0 of 0 entries";
-                els.paginationControls.innerHTML = "";
-                return;
-            }
-
-            const startIdx = (currentPage - 1) * rowsPerPage + 1;
-            const endIdx = Math.min(currentPage * rowsPerPage, totalItems);
-            els.pageInfo.innerText = `Showing ${startIdx} to ${endIdx} of ${totalItems} entries`;
-
-            let html = `
-                <button class="btn btn-sm btn-outline-secondary py-0" style="font-size: 11px;" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">Prev</button>
-            `;
-            for(let i = 1; i <= totalPages; i++) {
-                html += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-secondary'} py-0" style="font-size: 11px;" onclick="goToPage(${i})">${i}</button>`;
-            }
-            html += `
-                <button class="btn btn-sm btn-outline-secondary py-0" style="font-size: 11px;" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Next</button>
-            `;
-            
-            els.paginationControls.innerHTML = html;
-        }
-        
-        // Expose globally for onclick string
-        window.goToPage = function(page) {
-            currentPage = page;
-            renderPagination();
-            renderPage();
-        };
-
-        function renderPage() {
-            const startIdx = (currentPage - 1) * rowsPerPage;
-            const pageLeads = visibleLeadsCache.slice(startIdx, startIdx + rowsPerPage);
-            
-            const ctx = getHighlightContext();
-            const rulesActive = hasAnyHighlightRuleActive(ctx);
-            
-            renderRows(pageLeads, ctx, rulesActive);
-        }
-
-        function renderRows(list, ctx, rulesActive) {
-            els.tableBody.innerHTML = '';
-            
-            const emGrey = getRadioVal(els.emailMode) === 'Exclude' ? 'col-greyed' : '';
-            const domGrey = getRadioVal(els.domainMode) === 'Exclude' ? 'col-greyed' : '';
-            const comGrey = getRadioVal(els.companyMode) === 'Exclude' ? 'col-greyed' : '';
-
-            list.forEach(l => {
-                const tr = document.createElement('tr');
-                
-                let isMatch = false;
-                if (rulesActive && filtersApplied && currentTab !== 'Complete') {
-                    isMatch = passesHighlightFilters(l, ctx);
-                    // In Filtered tab, matching rows are highlighted
-                    if (isMatch && currentTab === 'Filtered') tr.classList.add('row-highlight');
-                }
-
-                // Show dashes for non-matching rows in Filtered View
-                const dashValues = filtersApplied && rulesActive && !isMatch && currentTab === 'Filtered';
-                const linkVal = `<a href="${l.linkedin}" style="color: var(--neon-cyan)" target="_blank"><i class="fa-brands fa-linkedin fs-5"></i></a>`;
-
-                const vIndustry = dashValues ? '—' : l.industry;
-                const vSize = dashValues ? '—' : l.size;
-                const vHq = dashValues ? '—' : l.hq;
-                const vLink = dashValues ? '—' : linkVal;
-
-                tr.innerHTML = `
-                    <td class="${emGrey} fw-medium"><a href="mailto:${l.email}" class="email-link">${l.email}</a></td>
-                    <td class="${domGrey}">${l.domain}</td>
-                    <td class="${comGrey} fw-semibold" style="color: var(--text-main)">${l.company}</td>
-                    <td><span class="geo-badge">${l.geo}</span></td>
-                    <td><span style="color: var(--neon-amber)">${l.cpc}</span></td>
-                    <td>${getStageBadge(l.stage)}</td>
-                    <td class="fw-bold">${getPriDot(l.priority)} ${l.priority}</td>
-                    <td>${getAbmBadge(l.abm)}</td>
-                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-muted">${vIndustry}</td>
-                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-muted">${vSize}</td>
-                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-muted">${vHq}</td>
-                    <td class="meta-col ${filtersApplied && currentTab !== 'Complete' ? '' : 'col-hidden'} text-center">${vLink}</td>
-                `;
-                els.tableBody.appendChild(tr);
-            });
-
-            if (list.length === 0) {
-                els.tableBody.innerHTML = `<tr><td colspan="12" class="text-center py-5 text-muted"><i class="fa-solid fa-ghost fs-1 mb-3 opacity-50"></i><br>No signals detected on this frequency.</td></tr>`;
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', init);
-
-
-    </script>
+  </script>
 </body>
 </html>
